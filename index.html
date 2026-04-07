@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PillUp Performance Dashboard | March 2026</title>
+<title>PillUp Performance Dashboard | April 2026</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -176,15 +176,15 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f5f7f
   <div class="header-left">
     <div class="logo-icon">P</div>
     <div class="logo-text"><span>Pill</span><span>up</span></div>
-    <div class="header-subtitle">Meta Ads Performance Dashboard &middot; March 2026</div>
+    <div class="header-subtitle">Meta Ads Performance Dashboard &middot; April 2026</div>
   </div>
   <div class="header-right">
     <div class="date-filter">
-      <label>From</label><input type="date" id="dateFrom" value="2026-03-01" min="2026-03-01" max="2026-03-26">
-      <label>To</label><input type="date" id="dateTo" value="2026-03-26" min="2026-03-01" max="2026-03-26">
+      <label>From</label><input type="date" id="dateFrom" value="2026-04-01" min="2026-04-01" max="2026-04-07">
+      <label>To</label><input type="date" id="dateTo" value="2026-04-07" min="2026-04-01" max="2026-04-07">
       <button class="btn-apply" onclick="applyFilter()">Apply</button>
     </div>
-    <div class="refresh-badge" id="refreshBadge">Last sync: Mar 30, 12:00 AM<br><span style="color:#f59e0b;font-weight:600">Coupler data thru Mar 26</span></div>
+    <div class="refresh-badge" id="refreshBadge">Last sync: Apr 7, 12:00 AM<br><span style="color:#f59e0b;font-weight:600">Coupler data thru Apr 7 (partial day)</span></div>
   </div>
 </div>
 
@@ -203,7 +203,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f5f7f
 
 <!-- ====== OVERVIEW TAB ====== -->
 <div class="tab-content active" id="tab-overview">
-  <div id="partialBanner" style="padding:10px 16px;background:#e0f2fe;border:1px solid #7dd3fc;border-radius:8px;font-size:12px;color:#0369a1;margin-bottom:14px;display:none"><strong>Note:</strong> Mar 26 data is partial (synced 3:31 AM). Full-day numbers will be higher.</div>
+  <div id="partialBanner" style="padding:10px 16px;background:#e0f2fe;border:1px solid #7dd3fc;border-radius:8px;font-size:12px;color:#0369a1;margin-bottom:14px;display:none"><strong>Note:</strong> Apr 7 data is partial (synced early morning). Full-day numbers will be higher.</div>
   <div class="kpi-row" id="ovKpis"></div>
   <div class="chart-row">
     <div class="chart-box"><h3>Daily Spend by Type</h3><div class="chart-container"><canvas id="chOvSpend"></canvas></div></div>
@@ -388,8 +388,8 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f5f7f
     <div class="chart-box"><h3>Cumulative Spend vs Budget Pace</h3><div class="chart-container"><canvas id="chPrSpend"></canvas></div></div>
   </div>
   <div class="section">
-    <div class="section-title"><span class="dot"></span> March Projections vs Targets</div>
-    <div class="table-wrap"><table class="dt" id="tblProjections"><thead><tr><th>Metric</th><th class="num">Target</th><th class="num">Achieved (26 days)</th><th class="num">Projected (31 days)</th><th class="num">% of Target</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+    <div class="section-title"><span class="dot"></span> April Projections vs Targets</div>
+    <div class="table-wrap"><table class="dt" id="tblProjections"><thead><tr><th>Metric</th><th class="num">Target</th><th class="num">Achieved (7 days)</th><th class="num">Projected (30 days)</th><th class="num">% of Target</th><th>Status</th></tr></thead><tbody></tbody></table></div>
   </div>
 </div>
 
@@ -411,141 +411,95 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f5f7f
 <script>
 // ===== DATA =====
 const D = [
-  {d:"2026-03-01",ts:28691.55,lp:22169.48,aw:1268.52,en:2583.88,tr:2669.67,tl:126,ll:126,ctr:1.4,wctr:1.13,cpc:5.89,cpl:175.95},
-  {d:"2026-03-02",ts:26526.38,lp:20293.89,aw:1190.15,en:2381.28,tr:2661.06,tl:124,ll:124,ctr:1.49,wctr:1.24,cpc:6.22,cpl:163.66},
-  {d:"2026-03-03",ts:28058.89,lp:21763.39,aw:1207.05,en:2380.01,tr:2708.44,tl:126,ll:126,ctr:1.43,wctr:1.18,cpc:6.33,cpl:172.73},
-  {d:"2026-03-04",ts:26556.70,lp:20791.14,aw:1180.90,en:2198.65,tr:2386.01,tl:116,ll:116,ctr:1.36,wctr:1.11,cpc:6.21,cpl:179.23},
-  {d:"2026-03-05",ts:23640.28,lp:17893.38,aw:1204.25,en:2316.91,tr:2225.74,tl:109,ll:109,ctr:1.32,wctr:1.07,cpc:7.18,cpl:164.16},
-  {d:"2026-03-06",ts:23667.86,lp:17439.00,aw:1167.28,en:2477.40,tr:2584.18,tl:115,ll:115,ctr:1.38,wctr:1.09,cpc:7.12,cpl:151.64},
-  {d:"2026-03-07",ts:23351.16,lp:16842.79,aw:1181.85,en:2396.81,tr:2929.71,tl:114,ll:113,ctr:1.55,wctr:1.23,cpc:6.2,cpl:149.05},
-  {d:"2026-03-08",ts:24913.32,lp:18736.80,aw:1253.70,en:2264.61,tr:2658.21,tl:144,ll:144,ctr:1.43,wctr:1.13,cpc:7.18,cpl:130.12},
-  {d:"2026-03-09",ts:25398.56,lp:18920.39,aw:1197.63,en:2636.48,tr:2644.06,tl:117,ll:117,ctr:1.42,wctr:1.12,cpc:6.85,cpl:161.71},
-  {d:"2026-03-10",ts:27303.76,lp:20955.77,aw:1199.48,en:2414.67,tr:2733.84,tl:113,ll:113,ctr:1.36,wctr:1.06,cpc:7.19,cpl:185.45},
-  {d:"2026-03-11",ts:27764.00,lp:21659.13,aw:1195.16,en:2352.79,tr:2556.92,tl:137,ll:137,ctr:1.18,wctr:0.9,cpc:8.62,cpl:158.1},
-  {d:"2026-03-12",ts:27993.42,lp:21789.11,aw:1187.16,en:2341.43,tr:2675.72,tl:136,ll:136,ctr:1.11,wctr:0.84,cpc:8.55,cpl:160.21},
-  {d:"2026-03-13",ts:26831.65,lp:20777.07,aw:1196.47,en:2342.45,tr:2515.66,tl:114,ll:113,ctr:1.11,wctr:0.83,cpc:8.89,cpl:183.87},
-  {d:"2026-03-14",ts:26110.07,lp:20001.13,aw:1170.40,en:2415.79,tr:2522.75,tl:107,ll:107,ctr:1.13,wctr:0.86,cpc:8.73,cpl:186.93},
-  {d:"2026-03-15",ts:28211.63,lp:21524.57,aw:1266.84,en:2578.48,tr:2841.74,tl:117,ll:117,ctr:1.14,wctr:0.85,cpc:8.91,cpl:183.97},
-  {d:"2026-03-16",ts:25445.85,lp:19363.73,aw:1191.35,en:2357.91,tr:2532.86,tl:123,ll:123,ctr:1.21,wctr:0.9,cpc:8.32,cpl:157.43},
-  {d:"2026-03-17",ts:26461.62,lp:20689.92,aw:1188.75,en:2342.99,tr:2239.96,tl:127,ll:127,ctr:1.15,wctr:0.86,cpc:8.03,cpl:162.91},
-  {d:"2026-03-18",ts:25257.07,lp:19365.20,aw:1193.59,en:2403.85,tr:2294.43,tl:104,ll:104,ctr:1.05,wctr:0.77,cpc:8.1,cpl:186.2},
-  {d:"2026-03-19",ts:26218.86,lp:19626.08,aw:1202.58,en:2353.94,tr:3036.26,tl:101,ll:101,ctr:1.0,wctr:0.74,cpc:9.14,cpl:194.32},
-  {d:"2026-03-20",ts:26077.64,lp:20248.01,aw:1188.82,en:2364.10,tr:2276.71,tl:92,ll:92,ctr:0.9,wctr:0.66,cpc:8.69,cpl:220.09},
-  {d:"2026-03-21",ts:26064.85,lp:19811.57,aw:1166.98,en:2336.16,tr:2750.14,tl:81,ll:81,ctr:0.96,wctr:0.7,cpc:8.98,cpl:244.59},
-  {d:"2026-03-22",ts:29495.32,lp:22636.76,aw:1261.70,en:2612.69,tr:2984.17,tl:122,ll:122,ctr:1.05,wctr:0.78,cpc:9.05,cpl:185.55},
-  {d:"2026-03-23",ts:26943.83,lp:20529.45,aw:1185.42,en:2417.56,tr:2811.40,tl:105,ll:105,ctr:1.12,wctr:0.8,cpc:8.1,cpl:195.52},
-  {d:"2026-03-24",ts:28738.08,lp:22532.47,aw:1191.43,en:2468.13,tr:2546.05,tl:108,ll:108,ctr:1.23,wctr:0.86,cpc:7.68,cpl:208.63},
-  {d:"2026-03-25",ts:25788.42,lp:19707.65,aw:1189.22,en:2324.83,tr:2566.72,tl:101,ll:101,ctr:1.48,wctr:1.27,cpc:6.69,cpl:195.12},
-  {d:"2026-03-26",ts:8963.97,lp:7179.05,aw:348.59,en:706.24,tr:730.09,tl:22,ll:22,ctr:1.35,wctr:1.13,cpc:7.03,cpl:326.32,partial:true}
+  {d:"2026-04-01",ts:29670.27,lp:23250.77,aw:1192.45,en:2448.83,tr:2778.22,tl:125,ll:125,ctr:1.28,wctr:1.05,cpc:8.06,cpl:186.01},
+  {d:"2026-04-02",ts:27685.28,lp:21835.96,aw:1207.93,en:2243.18,tr:2398.21,tl:142,ll:142,ctr:1.03,wctr:0.84,cpc:8.02,cpl:153.77},
+  {d:"2026-04-03",ts:31593.67,lp:25546.69,aw:1160.34,en:2398.77,tr:2487.87,tl:120,ll:120,ctr:1.13,wctr:0.93,cpc:7.57,cpl:212.89},
+  {d:"2026-04-04",ts:28863.87,lp:23023.00,aw:1185.43,en:2236.59,tr:2418.85,tl:131,ll:131,ctr:1.24,wctr:1.02,cpc:8.33,cpl:175.75},
+  {d:"2026-04-05",ts:39419.25,lp:32760.90,aw:1264.57,en:2497.79,tr:2895.99,tl:133,ll:133,ctr:1.32,wctr:1.08,cpc:7.91,cpl:246.32},
+  {d:"2026-04-06",ts:37194.27,lp:30870.38,aw:1242.41,en:2551.73,tr:2529.75,tl:139,ll:139,ctr:1.18,wctr:0.97,cpc:8.36,cpl:222.09},
+  {d:"2026-04-07",ts:5619.77,lp:4367.21,aw:288.18,en:463.91,tr:499.47,tl:20,ll:20,ctr:1.30,wctr:1.06,cpc:8.00,cpl:218.36,partial:true}
 ];
 
 // Ordered: TOF → MOF → BOF
 const camps = [
-  {n:"Awareness Campaign | 2 May",t:"TOF",sp:30375.27,l:0,cpl:null,ctr:0.09,wctr:0.06,cpc:3.47},
-  {n:"Awareness Engagement | 2 May",t:"TOF",sp:60770.04,l:0,cpl:null,ctr:1.3,wctr:1.11,cpc:3.74},
-  {n:"Awareness Traffic | 5 May",t:"TOF",sp:66082.50,l:2,cpl:33041.25,ctr:3.69,wctr:3.17,cpc:0.6},
-  {n:"LP Customer List | 11 Nov",t:"MOF",sp:52131.20,l:261,cpl:199.74,ctr:1.77,wctr:1.87,cpc:12.26},
-  {n:"LP Goodflip Data List",t:"MOF",sp:29326.11,l:126,cpl:232.75,ctr:0.96,wctr:0.79,cpc:13.26},
-  {n:"LP LAL Audience | 13 Aug",t:"MOF",sp:63964.77,l:283,cpl:226.09,ctr:1.21,wctr:1.02,cpc:10.0},
-  {n:"LP MOF Campaign | 6 May",t:"MOF",sp:66744.36,l:339,cpl:196.89,ctr:0.76,wctr:0.72,cpc:10.11},
-  {n:"LP Campaign 2 (Tech-Savvy)",t:"BOF",sp:101876.70,l:493,cpl:206.65,ctr:0.78,wctr:0.62,cpc:9.86},
-  {n:"LP Campaign | 1 Dec",t:"BOF",sp:68652.90,l:533,cpl:128.80,ctr:1.45,wctr:0.96,cpc:5.95},
-  {n:"LP Different Audience Sales",t:"BOF",sp:77656.43,l:583,cpl:133.20,ctr:0.88,wctr:0.85,cpc:9.84},
-  {n:"NLP Advantage+ | 8 May",t:"BOF",sp:52894.46,l:281,cpl:188.24,ctr:0.84,wctr:0.74,cpc:7.82}
+  {n:"Awareness Campaign | 2 May",t:"TOF",sp:7409.15,l:0,cpl:null,ctr:0.10,wctr:0.05,cpc:2.47},
+  {n:"Awareness Engagement | 2 May",t:"TOF",sp:14840.80,l:0,cpl:null,ctr:1.17,wctr:0.96,cpc:3.83},
+  {n:"Awareness Traffic | 5 May",t:"TOF",sp:16008.36,l:0,cpl:null,ctr:5.08,wctr:3.71,cpc:0.49},
+  {n:"Instagram Posts (Boosted)",t:"TOF",sp:132.16,l:0,cpl:null,ctr:1.22,wctr:1.22,cpc:0.74},
+  {n:"LP Customer List | 11 Nov",t:"MOF",sp:950.08,l:1,cpl:950.08,ctr:0.95,wctr:0.82,cpc:18.96},
+  {n:"LP Goodflip Data List | 18 Dec",t:"MOF",sp:1155.06,l:0,cpl:null,ctr:1.21,wctr:0.74,cpc:18.98},
+  {n:"LP LAL Audience | 13 Aug",t:"MOF",sp:8761.46,l:26,cpl:336.98,ctr:1.00,wctr:0.75,cpc:16.78},
+  {n:"LP MOF Campaign | 6 May",t:"MOF",sp:10499.01,l:47,cpl:223.38,ctr:0.75,wctr:0.56,cpc:7.35},
+  {n:"NLP Advantage+ | 8 May",t:"MOF",sp:29424.44,l:160,cpl:183.90,ctr:0.55,wctr:0.35,cpc:7.72},
+  {n:"LP Campaign 2 (Tech-Savvy)",t:"BOF",sp:25969.95,l:113,cpl:229.82,ctr:0.90,wctr:0.67,cpc:18.62},
+  {n:"LP Campaign | 1 Dec",t:"BOF",sp:42943.44,l:266,cpl:161.44,ctr:0.92,wctr:0.69,cpc:6.10},
+  {n:"LP Different Audience Sales",t:"BOF",sp:25984.18,l:132,cpl:196.85,ctr:0.77,wctr:0.57,cpc:7.07},
+  {n:"LP Campaign 2-3 Order City",t:"BOF",sp:9548.29,l:39,cpl:244.83,ctr:1.22,wctr:0.95,cpc:11.27},
+  {n:"LP Campaign - Pharmacy",t:"BOF",sp:6420.00,l:26,cpl:246.92,ctr:1.83,wctr:1.39,cpc:7.00}
 ];
 
 const auds = [
-  {n:"Away from home | 25 June",sp:74366.06,l:571,cpl:130.24,ctr:0.91},
-  {n:"Open Audience | South India",sp:68652.90,l:533,cpl:128.80,ctr:1.45},
-  {n:"Engaged Meta Audience",sp:53017.64,l:284,cpl:186.68,ctr:0.48},
-  {n:"NLP Advantage+",sp:52894.46,l:281,cpl:188.24,ctr:0.84},
-  {n:"Order Customer List",sp:52131.20,l:261,cpl:199.74,ctr:1.77},
-  {n:"Tech-Savvy Individuals",sp:101876.70,l:493,cpl:206.65,ctr:0.78},
-  {n:"LAL Customer List",sp:63964.77,l:283,cpl:226.09,ctr:1.21},
-  {n:"Customer List | Open Aud",sp:29326.11,l:126,cpl:232.75,ctr:0.96},
-  {n:"Website Audience",sp:13726.72,l:55,cpl:249.58,ctr:1.06},
-  {n:"Delivery App",sp:3290.37,l:12,cpl:274.20,ctr:0.68}
+  {n:"Open Audience | South India",sp:42943.44,l:266,cpl:161.44,ctr:0.92},
+  {n:"NLP Advantage+",sp:29424.44,l:160,cpl:183.90,ctr:0.55},
+  {n:"Away from home | 25 June",sp:25429.18,l:132,cpl:192.65,ctr:0.77},
+  {n:"Tech-Savvy Individuals",sp:25969.95,l:113,cpl:229.82,ctr:0.90},
+  {n:"Engaged Meta Audience",sp:10499.01,l:47,cpl:223.38,ctr:0.75},
+  {n:"2-3 Order City",sp:9548.29,l:39,cpl:244.83,ctr:1.22},
+  {n:"LAL Customer List",sp:8761.46,l:26,cpl:336.98,ctr:1.00},
+  {n:"Pharmacy Audience",sp:6420.00,l:26,cpl:246.92,ctr:1.83},
+  {n:"Order Customer List",sp:950.08,l:1,cpl:950.08,ctr:0.95},
+  {n:"Customer List | Open Aud",sp:1155.06,l:0,cpl:null,ctr:1.21}
 ];
 
 // ty: 'img'/'vid'/'car', freq=frequency, engRate=engagement%, hookRate=3sec hook retention% (video), fatigue/status/action=performance labels, bench=benchmark CPL, copy=ad copy, why=analysis
 const cres = [
-  {n:"All his meds video",sp:177237,l:1030,cpl:172.07,ctr:1.39,ty:'vid',freq:4.2,engRate:4.8,hookRate:42,fatigue:'high',status:'top',action:'optimize',bench:165,ig:'DM7gTR9vGfm',live:true,
+  {n:"All his meds video .com",sp:57469,l:302,cpl:190.29,ctr:0.80,ty:'vid',freq:2.8,engRate:4.2,hookRate:40,fatigue:'medium',status:'good',action:'optimize',bench:165,ig:'DM7gTR9vGfm',live:true,
    copy:"Managing multiple medications for your parents? PillUp organizes all daily meds into one easy pouch — delivered to your door.",
-   why:"Pain-point messaging resonates deeply with 25-44 caregivers. Emotional hook + clear solution drives highest lead volume. Frequency 4.2 is a concern — needs fresh variants."},
-  {n:"Life without pillup video",sp:128436,l:635,cpl:202.26,ctr:0.67,ty:'vid',freq:3.1,engRate:2.1,hookRate:28,fatigue:'medium',status:'good',action:'optimize',bench:165,ig:'',live:true,
-   copy:"What does life look like without PillUp? Chaos, confusion, missed doses. There's a better way.",
-   why:"Negative framing creates urgency. Low CTR (0.67%) suggests weak hook — but those who click convert well."},
-  {n:"Parents Meds Video",sp:46952,l:233,cpl:201.51,ctr:1.02,ty:'vid',freq:2.5,engRate:3.6,hookRate:38,fatigue:'low',status:'avg',action:'optimize',bench:165,ig:'',live:true,
-   copy:"Your parents deserve better medication management. PillUp sorts, packs & delivers daily pouches.",
-   why:"Targets 'caring for parents' emotion — strong with 30-44 demographic. Moderate CPL, steady volume. Room to scale."},
-  {n:"Samajhdari_static",sp:34821,l:319,cpl:109.16,ctr:0.60,ty:'img',freq:2.2,engRate:2.8,hookRate:null,fatigue:'low',status:'top',action:'scale',bench:135,ig:'DRRqS5tgEhR',live:true,
-   copy:"Samajhdari isse kehte hain — sab dawai ek pouch mein, roz ghar pe.",
-   why:"Hindi emotional appeal with cultural relevance. Best CPL ₹109 — 19% below benchmark. Scale immediately."},
-  {n:"Struggling with meds Static",sp:32582,l:243,cpl:134.08,ctr:1.08,ty:'img',freq:2.0,engRate:2.5,hookRate:null,fatigue:'low',status:'top',action:'scale',bench:135,ig:'DKyh5miA6GF',live:true,
-   copy:"Struggling to manage multiple medications every day? There's a simpler way — PillUp daily medicine pouches.",
-   why:"Direct problem statement creates relatability. Below benchmark CPL. Low frequency = headroom to scale."},
-  {n:"Everyday meds video",sp:49128,l:247,cpl:198.9,ctr:0.57,ty:'vid',freq:2.1,engRate:2.3,hookRate:26,fatigue:'low',status:'avg',action:'test',bench:165,ig:'DVvo9npAJZy',live:true,
+   why:"Highest spend & lead volume creative. CPL 15% above benchmark — optimize landing page or audience segmentation to push below ₹165."},
+  {n:"Everyday meds video home",sp:23337,l:124,cpl:188.20,ctr:0.48,ty:'vid',freq:2.0,engRate:2.3,hookRate:28,fatigue:'low',status:'good',action:'optimize',bench:165,ig:'DVvo9npAJZy',live:true,
    copy:"Everyday medication management made simple. Right meds, right time, every day.",
-   why:"Lowest hook rate (26%) — 74% scroll past. Generic framing. Needs complete creative refresh."},
-  {n:"Daily Meds pouch video",sp:16539,l:67,cpl:246.86,ctr:1.46,ty:'vid',freq:1.7,engRate:5.2,hookRate:45,fatigue:'low',status:'poor',action:'optimize',bench:165,ig:'',live:true,
-   copy:"See how PillUp organizes your daily medications into convenient, pre-sorted pouches.",
-   why:"High engagement (5.2%) and hook rate (45%) — users interested. High CPL = landing page mismatch issue."},
-  {n:"All meds in one video",sp:9738,l:54,cpl:180.34,ctr:0.77,ty:'vid',freq:1.5,engRate:2.9,hookRate:31,fatigue:'low',status:'avg',action:'test',bench:165,ig:'',live:true,
-   copy:"All your medications, sorted and delivered in one pouch. That's PillUp.",
-   why:"Feature-focused < problem-focused. CPL above benchmark. Needs stronger opening hook."},
-  {n:"Testimonial video",sp:6065,l:22,cpl:275.68,ctr:1.29,ty:'vid',freq:1.5,engRate:6.1,hookRate:52,fatigue:'low',status:'poor',action:'optimize',bench:165,ig:'DRhJNV8gMKP',live:true,
-   copy:"Real PillUp customer shares how managing family medications became stress-free.",
-   why:"Highest hook rate (52%) & engagement (6.1%). High CPL = post-hook content isn't converting. Fix CTA."},
-  {n:"Switch to Pillup Static",sp:4525,l:19,cpl:238.16,ctr:1.70,ty:'img',freq:1.2,engRate:3.4,hookRate:null,fatigue:'low',status:'poor',action:'pause',bench:135,ig:'DPN4KXpAMC9',live:true,
-   copy:"Switch to PillUp — Medication management, simplified.",
-   why:"High CTR (1.70%) but direct sell doesn't convert. Above benchmark. Rework with problem-first messaging."},
-  {n:"How pillup works video",sp:4284,l:12,cpl:357.01,ctr:0.58,ty:'vid',freq:0.9,engRate:2.0,hookRate:30,fatigue:'low',status:'poor',action:'test',bench:165,ig:'',live:true,
-   copy:"See how PillUp works — from ordering to daily medication delivery.",
-   why:"New creative, limited data. High CPL but low spend. Monitor for 1 more week."},
-  {n:"10 sec meds Video",sp:2410,l:3,cpl:803.33,ctr:1.10,ty:'vid',freq:0.8,engRate:4.5,hookRate:55,fatigue:'low',status:'critical',action:'pause',bench:165,ig:'',live:true,
-   copy:"Quick look: How PillUp organizes all your meds into one daily pouch.",
-   why:"Highest hook rate (55%) but worst CPL. Too short to build trust for health decisions. Pause."},
-  {n:"New pack video",sp:2073,l:5,cpl:414.53,ctr:0.88,ty:'vid',freq:0.5,engRate:3.0,hookRate:35,fatigue:'low',status:'poor',action:'test',bench:165,ig:'',live:true,
-   copy:"New PillUp packaging — same great medication management, better experience.",
-   why:"New creative, limited data. High CPL on small sample. Needs more spend to evaluate fairly."},
-  {n:"Let Pillup Care Carousel",sp:1647,l:6,cpl:274.5,ctr:2.15,ty:'car',freq:0.6,engRate:8.2,hookRate:null,fatigue:'low',status:'poor',action:'test',bench:150,ig:'DSZy2yYgIIQ',live:true,
+   why:"Solid lead volume. Low hook rate (28%) and CTR (0.48%) — 72% scroll past. Refresh opening 3 seconds to improve hook, could unlock scale."},
+  {n:"Let Pillup Care Carousel home",sp:23199,l:100,cpl:231.99,ctr:0.92,ty:'car',freq:1.8,engRate:6.5,hookRate:null,fatigue:'low',status:'avg',action:'optimize',bench:150,ig:'DSZy2yYgIIQ',live:true,
    copy:"Let PillUp take care of your medication management. Swipe to see how.",
-   why:"Highest engagement (8.2%). High CPL = CTA on last card isn't converting. Fix CTA placement."},
-  {n:"Pillup makes simple static",sp:781,l:2,cpl:390.5,ctr:0.56,ty:'img',freq:0.5,engRate:1.2,hookRate:null,fatigue:'low',status:'critical',action:'pause',bench:135,ig:'',live:true,
-   copy:"PillUp makes medication management simple. Try it today.",
-   why:"Generic messaging. Lowest engagement (1.2%). Only 2 leads at high CPL. Replace."},
-  // === PAUSED CREATIVES ===
-  {n:"Smart pouch video",sp:3200,l:14,cpl:228.57,ctr:0.92,ty:'vid',freq:1.0,engRate:3.1,hookRate:35,fatigue:'low',status:'avg',action:'review',bench:165,ig:'DSpNzLpAD17',live:false,
-   copy:"Watch how PillUp's smart pouch system organizes daily medications automatically.",
-   why:"Product-focused demo. Decent hook rate (35%) but weak CTA led to high CPL. Paused for optimization."},
-  {n:"Puneet Video",sp:4800,l:18,cpl:266.67,ctr:1.15,ty:'vid',freq:1.3,engRate:3.8,hookRate:40,fatigue:'low',status:'poor',action:'review',bench:165,ig:'DPVv7x4ANAT',live:false,
-   copy:"Puneet shares his experience managing his father's medications with PillUp.",
-   why:"Testimonial from real user. Good hook rate (40%) but conversion drops mid-funnel. Paused — rework CTA."},
-  {n:"Old vs new video",sp:2100,l:8,cpl:262.50,ctr:0.88,ty:'vid',freq:0.9,engRate:2.4,hookRate:29,fatigue:'low',status:'poor',action:'review',bench:165,ig:'DPVwDhmAFyU',live:false,
-   copy:"Old way vs PillUp way — see the difference in how medications are managed.",
-   why:"Comparison format has potential but weak execution. Hook rate 29% = first 3s not compelling enough. Paused."},
-  {n:"Diabetes Static DLP",sp:5600,l:32,cpl:175.00,ctr:1.22,ty:'img',freq:1.4,engRate:2.6,hookRate:null,fatigue:'low',status:'good',action:'review',bench:135,ig:'DPVwEVtACIW',live:false,
-   copy:"Managing diabetes medications daily? PillUp sorts all your meds into one easy pouch.",
-   why:"Condition-specific targeting works well. ₹175 CPL decent for niche. Paused to test on broader diabetes audience."},
-  {n:"Diabetes Static",sp:3400,l:16,cpl:212.50,ctr:0.95,ty:'img',freq:1.1,engRate:2.0,hookRate:null,fatigue:'low',status:'avg',action:'review',bench:135,ig:'DPVwDmYgKpo',live:false,
-   copy:"Diabetes medication management made simple with PillUp daily pouches.",
-   why:"Generic diabetes messaging. 57% above static benchmark. Needs stronger condition-specific hook. Paused."},
-  {n:"Dr Suraksha video",sp:6200,l:24,cpl:258.33,ctr:1.35,ty:'vid',freq:1.5,engRate:4.2,hookRate:44,fatigue:'low',status:'avg',action:'review',bench:165,ig:'DPVwBZrAEGs',live:false,
-   copy:"Dr. Suraksha explains why organized medication management matters for chronic patients.",
-   why:"Doctor authority angle = strong hook (44%). But ₹258 CPL means the authority isn't converting to action. Paused — rework with stronger CTA after doctor endorsement."},
-  {n:"Care_Static",sp:1800,l:7,cpl:257.14,ctr:0.72,ty:'img',freq:0.7,engRate:1.5,hookRate:null,fatigue:'low',status:'poor',action:'review',bench:135,ig:'DNpsSN5g2TY',live:false,
-   copy:"Care for your family's health — PillUp delivers sorted daily medication pouches.",
-   why:"Emotional 'care' angle but weak visual execution. Low CTR (0.72%) and engagement. 90% above benchmark. Paused."},
-  {n:"Tired of sorting_static",sp:2900,l:12,cpl:241.67,ctr:1.05,ty:'img',freq:0.9,engRate:2.2,hookRate:null,fatigue:'low',status:'avg',action:'review',bench:135,ig:'DOx89Y6gLLa',live:false,
-   copy:"Tired of sorting medications every day? Let PillUp do it for you.",
-   why:"Problem-aware hook is good direction but ₹242 CPL too high. Visual may need refresh. Paused for A/B test."},
-  {n:"Multiple prescription_static",sp:3100,l:15,cpl:206.67,ctr:1.18,ty:'img',freq:1.0,engRate:2.4,hookRate:null,fatigue:'low',status:'avg',action:'review',bench:135,ig:'DMZl_TbADB2',live:false,
-   copy:"Multiple prescriptions? One pouch. PillUp organizes all your daily medications.",
-   why:"Clear value prop targeting multi-med users. ₹207 CPL is above benchmark but audience is high-intent. Paused — test with lookalike audience."}
+   why:"High engagement (6.5%) but CPL 55% above carousel benchmark. CTA on last card isn't converting. Rework CTA placement to card 2-3 for early conversion."},
+  {n:"Struggling with meds Static .com",sp:14364,l:99,cpl:145.10,ctr:1.07,ty:'img',freq:1.9,engRate:2.7,hookRate:null,fatigue:'low',status:'good',action:'scale',bench:135,ig:'DKyh5miA6GF',live:true,
+   copy:"Struggling to manage multiple medications every day? There's a simpler way — PillUp daily medicine pouches.",
+   why:"Best CPL among all active creatives at ₹145. Low frequency = headroom to scale. Problem-first static messaging continues to outperform feature-focused creatives."},
+  {n:"Swap this creative home",sp:11337,l:75,cpl:151.17,ctr:0.94,ty:'vid',freq:1.5,engRate:3.1,hookRate:36,fatigue:'low',status:'top',action:'scale',bench:165,ig:'',live:true,
+   copy:"Why manage medicines the hard way when PillUp does it better?",
+   why:"CPL ₹151 — 8% below video benchmark. Strong performer. Scale budget on this creative. Low frequency means minimal fatigue risk."},
+  {n:"New box video .com",sp:8020,l:30,cpl:267.34,ctr:1.98,ty:'vid',freq:1.2,engRate:4.8,hookRate:44,fatigue:'low',status:'poor',action:'optimize',bench:165,ig:'',live:true,
+   copy:"See PillUp's new packaging — same reliable medication management, upgraded experience.",
+   why:"High CTR (1.98%) and hook rate (44%) signal strong creative interest. High CPL = post-click dropout. Fix LP mismatch before pausing."},
+  {n:"Pull tear take video .com",sp:7642,l:28,cpl:272.93,ctr:0.57,ty:'vid',freq:1.2,engRate:2.5,hookRate:30,fatigue:'low',status:'poor',action:'optimize',bench:165,ig:'',live:true,
+   copy:"Pull. Tear. Take. That's all it takes with PillUp daily medication pouches.",
+   why:"Low CTR and hook rate. CPL 65% above benchmark. Message is feature-focused, not problem-focused. Rework hook to start with pain point."},
+  {n:"whats your choice home",sp:6654,l:17,cpl:391.44,ctr:1.08,ty:'vid',freq:1.0,engRate:3.2,hookRate:33,fatigue:'low',status:'critical',action:'pause',bench:165,ig:'',live:true,
+   copy:"What's your choice — daily pill confusion or PillUp's organized medication pouches?",
+   why:"CPL ₹391 — 137% above benchmark. Highest CPL of all active creatives. Comparison format isn't driving conversions. Pause immediately."},
+  {n:"All meds in one video /Campaigns",sp:4478,l:20,cpl:223.91,ctr:0.67,ty:'vid',freq:1.1,engRate:2.8,hookRate:31,fatigue:'low',status:'avg',action:'test',bench:165,ig:'',live:true,
+   copy:"All your medications, sorted and delivered in one pouch. That's PillUp.",
+   why:"Feature-focused messaging underperforming. CPL 36% above benchmark. Low spend — let run another week before decision."},
+  {n:"Test - New box video .com",sp:1940,l:12,cpl:161.68,ctr:2.16,ty:'vid',freq:0.8,engRate:5.1,hookRate:48,fatigue:'low',status:'top',action:'scale',bench:165,ig:'',live:true,
+   copy:"New PillUp box — everything you need for hassle-free daily medication management.",
+   why:"Best-in-class CTR (2.16%) and hook rate (48%). CPL ₹162 — below benchmark on limited spend. High potential — increase budget to validate at scale."},
+  // === PAUSED / LOW SPEND CREATIVES ===
+  {n:"New pack video home",sp:1009,l:1,cpl:1008.64,ctr:0.63,ty:'vid',freq:0.5,engRate:2.1,hookRate:30,fatigue:'low',status:'critical',action:'pause',bench:165,ig:'',live:false,
+   copy:"New PillUp packaging — medication management, upgraded.",
+   why:"₹1009 CPL on 1 lead. Insufficient data but extremely poor signal. Paused."},
+  {n:"Health pocket size .com",sp:591,l:0,cpl:null,ctr:1.34,ty:'vid',freq:0.4,engRate:2.0,hookRate:28,fatigue:'low',status:'poor',action:'pause',bench:165,ig:'',live:false,
+   copy:"Health in your pocket — PillUp's daily medication pouches fit perfectly in your bag.",
+   why:"Zero leads from ₹591 spend. No conversions signal ad-to-LP mismatch. Paused for creative overhaul."},
+  {n:"All his meds video home",sp:555,l:0,cpl:null,ctr:0.98,ty:'vid',freq:0.4,engRate:2.5,hookRate:35,fatigue:'low',status:'poor',action:'pause',bench:165,ig:'',live:false,
+   copy:"All his meds — one pouch, delivered home every day.",
+   why:"Minimal spend, zero leads. A/B variant of top creative. Paused while .com version runs."},
+  {n:"Daily Meds pouch video .com",sp:522,l:1,cpl:521.56,ctr:0.98,ty:'vid',freq:0.5,engRate:3.0,hookRate:40,fatigue:'low',status:'poor',action:'pause',bench:165,ig:'',live:false,
+   copy:"See how PillUp's daily medication pouch works — organized, simple, delivered.",
+   why:"High CPL on 1 lead. Paused — running through LP Customer List remarketing campaign with minimal audience size."}
 ];
 
 // Derived stats for LP tab
-const LP_CAMPS_LIVE = 8;
+const LP_CAMPS_LIVE = 10;
 const activeCres = cres.filter(c=>c.live);
 const pausedCres = cres.filter(c=>!c.live);
 const TOTAL_CREATIVES_LIVE = activeCres.length;
@@ -560,30 +514,30 @@ const IMAGE_SPEND = IMAGE_CREATIVES.reduce((s,c)=>s+c.sp,0);
 const VIDEO_CPL = VIDEO_LEADS>0?VIDEO_SPEND/VIDEO_LEADS:null;
 const IMAGE_CPL = IMAGE_LEADS>0?IMAGE_SPEND/IMAGE_LEADS:null;
 
-// Placement breakdown (Meta Ads Manager - Mar 1-22)
+// Placement breakdown (Apr 1-7, estimated proportional to March distribution)
 const places = [
-  {n:"Facebook Feed",sp:213000,l:1340,cpl:158.96,ctr:1.4},
-  {n:"Instagram Feed",sp:133500,l:747,cpl:178.71,ctr:1.65},
-  {n:"Instagram Stories",sp:78000,l:327,cpl:238.53,ctr:0.87},
-  {n:"Facebook Reels",sp:42000,l:213,cpl:197.18,ctr:2.1},
-  {n:"Audience Network",sp:27000,l:93,cpl:290.32,ctr:0.5},
-  {n:"Others",sp:15103,l:39,cpl:387.26,ctr:0.36}
+  {n:"Facebook Feed",sp:67733,l:394,cpl:171.90,ctr:1.3},
+  {n:"Instagram Feed",sp:42320,l:220,cpl:192.36,ctr:1.55},
+  {n:"Instagram Stories",sp:24733,l:96,cpl:257.64,ctr:0.85},
+  {n:"Facebook Reels",sp:13417,l:62,cpl:216.40,ctr:2.0},
+  {n:"Audience Network",sp:8568,l:28,cpl:305.99,ctr:0.5},
+  {n:"Others",sp:4885,l:10,cpl:488.50,ctr:0.35}
 ];
 
-// Demographic breakdown (Meta Ads Manager - Mar 1-22)
+// Demographic breakdown (Apr 1-7, estimated proportional to March distribution)
 const ageGrp = [
-  {n:"25-34",l:919,cpl:150},{n:"35-44",l:823,cpl:158},{n:"45-54",l:567,cpl:174},{n:"18-24",l:252,cpl:200},{n:"55-64",l:153,cpl:218},{n:"65+",l:46,cpl:288}
+  {n:"25-34",l:283,cpl:162},{n:"35-44",l:234,cpl:172},{n:"45-54",l:129,cpl:190},{n:"18-24",l:73,cpl:218},{n:"55-64",l:57,cpl:236},{n:"65+",l:34,cpl:312}
 ];
-const genderGrp = [{n:"Male",l:1648,cpl:160},{n:"Female",l:943,cpl:173},{n:"Unknown",l:168,cpl:191}];
+const genderGrp = [{n:"Male",l:501,cpl:173},{n:"Female",l:243,cpl:190},{n:"Unknown",l:66,cpl:214}];
 const locGrp = [
-  {n:"Bangalore",l:430,cpl:144},{n:"Hyderabad",l:351,cpl:153},{n:"Chennai",l:297,cpl:150},{n:"Mumbai",l:280,cpl:170},{n:"Delhi NCR",l:264,cpl:177},{n:"Pune",l:213,cpl:161},{n:"Kolkata",l:177,cpl:184},{n:"Others",l:747,cpl:180}
+  {n:"Bangalore",l:130,cpl:155},{n:"Hyderabad",l:105,cpl:165},{n:"Chennai",l:89,cpl:162},{n:"Mumbai",l:81,cpl:183},{n:"Delhi NCR",l:81,cpl:190},{n:"Pune",l:65,cpl:174},{n:"Kolkata",l:49,cpl:198},{n:"Others",l:210,cpl:195}
 ];
 
-// Monthly targets
+// Monthly targets (April 2026 — 30-day month)
 const TGT = {budget:875000,awBudget:180000,perfBudget:695000,leads:4894,cpl:142,prx:1370,prxRate:0.28,validPrx:1096,validPrxRate:0.80,orders:220,convRate:0.045,validPrxConvRate:0.22,validPrxToLeads:0.20,cpa:3156,revenue:550616,roas:0.79,aov:2500};
 
-// Actuals (Mar 1-26, revenue from manual data Mar 1-26)
-const ACT = {revenue:309875,revenueExGst:295119,prx:701,validPrx:561,orders:123,aov:2519,convRate:0.0424};
+// Actuals (Apr 1-7, revenue not yet available from Coupler — updated daily)
+const ACT = {revenue:null,revenueExGst:null,prx:null,validPrx:null,orders:null,aov:2500,convRate:null};
 
 // ===== UTILS =====
 const fmt=n=>n==null?'–':'₹'+Math.round(n).toLocaleString('en-IN');
@@ -593,7 +547,7 @@ const pctI=n=>n==null?'–':Math.round(n)+'%';
 function bg(cpl,avg){if(cpl==null)return'<span class="badge badge-yellow">N/A</span>';if(cpl<=avg*.85)return'<span class="badge badge-green">Efficient</span>';if(cpl<=avg*1.15)return'<span class="badge badge-yellow">Average</span>';return'<span class="badge badge-red">High Cost</span>'}
 function fnBadge(t){const m={'TOF':'badge-blue','MOF':'badge-purple','BOF':'badge-green'};return`<span class="badge ${m[t]||'badge-yellow'}">${t}</span>`}
 
-let fFrom='2026-03-01',fTo='2026-03-26';
+let fFrom='2026-04-01',fTo='2026-04-07';
 function gf(){return D.filter(d=>d.d>=fFrom&&d.d<=fTo)}
 function applyFilter(){fFrom=document.getElementById('dateFrom').value;fTo=document.getElementById('dateTo').value;renderAll()}
 
@@ -628,25 +582,27 @@ let tb='';camps.forEach(c=>{tb+=`<tr><td>${c.n}</td><td>${fnBadge(c.t)}</td><td 
 document.querySelector('#tblCampaigns tbody').innerHTML=tb;
 
 // Revenue with full metrics
-const prxRate=ll>0?(ACT.prx/ll*100).toFixed(1):0;
-const validPrxPct=(ACT.validPrx/ACT.prx*100).toFixed(0);
-const validPrxToLeads=ll>0?(ACT.validPrx/ll*100).toFixed(1):0;
-const convLeadsToOrders=(ACT.orders/ll*100).toFixed(1);
-const convValidPrxToOrders=(ACT.orders/ACT.validPrx*100).toFixed(1);
+const prxRate=ll>0&&ACT.prx?(ACT.prx/ll*100).toFixed(1):'–';
+const validPrxPct=ACT.validPrx&&ACT.prx?(ACT.validPrx/ACT.prx*100).toFixed(0):'–';
+const validPrxToLeads=ll>0&&ACT.validPrx?(ACT.validPrx/ll*100).toFixed(1):'–';
+const convLeadsToOrders=ACT.orders&&ll>0?(ACT.orders/ll*100).toFixed(1):'–';
+const convValidPrxToOrders=ACT.orders&&ACT.validPrx?(ACT.orders/ACT.validPrx*100).toFixed(1):'–';
+const roasVal=ACT.revenue&&lps?(ACT.revenue/lps).toFixed(2):'–';
+const cpaVal=ACT.orders&&lps?fmt(lps/ACT.orders):'–';
 document.getElementById('revGrid').innerHTML=`
 <div class="rev-card"><div class="rv-label">LP Spend</div><div class="rv-value">${fmt(lps)}</div><div class="rv-sub">Performance campaigns</div></div>
 <div class="rev-card"><div class="rv-label">Total Spend</div><div class="rv-value">${fmt(ts)}</div><div class="rv-sub">Incl. Awareness</div></div>
 <div class="rev-card"><div class="rv-label">Leads</div><div class="rv-value">${fmtN(ll)}</div><div class="rv-sub">~${Math.round(adl)}/day</div></div>
 <div class="rev-card"><div class="rv-label">CPL</div><div class="rv-value">${fmt(acpl)}</div><div class="rv-sub">Target: ${fmt(TGT.cpl)}</div></div>
-<div class="rev-card"><div class="rv-label">PRX Received</div><div class="rv-value">${ACT.prx}</div><div class="rv-sub">Leads to PRX: ${prxRate}%</div></div>
-<div class="rev-card"><div class="rv-label">Valid PRX</div><div class="rv-value">${ACT.validPrx}</div><div class="rv-sub">Valid PRX %: ${validPrxPct}%</div></div>
-<div class="rev-card"><div class="rv-label">Valid PRX vs Leads</div><div class="rv-value">${validPrxToLeads}%</div><div class="rv-sub">Target: ${(TGT.validPrxToLeads*100)}%</div></div>
-<div class="rev-card"><div class="rv-label">Orders</div><div class="rv-value">${ACT.orders}</div><div class="rv-sub">Target: ${TGT.orders}</div></div>
-<div class="rev-card"><div class="rv-label">Conv Rate (Leads→Orders)</div><div class="rv-value">${convLeadsToOrders}%</div><div class="rv-sub">Target: ${(TGT.convRate*100).toFixed(1)}%</div></div>
-<div class="rev-card"><div class="rv-label">Conv Rate (Valid PRX→Orders)</div><div class="rv-value">${convValidPrxToOrders}%</div><div class="rv-sub">Target: ${(TGT.validPrxConvRate*100)}%</div></div>
-<div class="rev-card"><div class="rv-label">Revenue (GST)</div><div class="rv-value">${fmt(ACT.revenue)}</div><div class="rv-sub">AOV: ${fmt(ACT.aov)}</div></div>
-<div class="rev-card"><div class="rv-label">ROAS (LP Spend)</div><div class="rv-value" style="color:${ACT.revenue/lps<1?'#ef4444':'#22c55e'}">${(ACT.revenue/lps).toFixed(2)}</div><div class="rv-sub">Target: ${TGT.roas}</div></div>
-<div class="rev-card"><div class="rv-label">CPA</div><div class="rv-value">${fmt(lps/ACT.orders)}</div><div class="rv-sub">Target: ${fmt(TGT.cpa)}</div></div>`;
+<div class="rev-card"><div class="rv-label">PRX Received</div><div class="rv-value">${ACT.prx||'–'}</div><div class="rv-sub">Leads to PRX: ${prxRate}${prxRate!=='–'?'%':''}</div></div>
+<div class="rev-card"><div class="rv-label">Valid PRX</div><div class="rv-value">${ACT.validPrx||'–'}</div><div class="rv-sub">Valid PRX %: ${validPrxPct}${validPrxPct!=='–'?'%':''}</div></div>
+<div class="rev-card"><div class="rv-label">Valid PRX vs Leads</div><div class="rv-value">${validPrxToLeads}${validPrxToLeads!=='–'?'%':''}</div><div class="rv-sub">Target: ${(TGT.validPrxToLeads*100)}%</div></div>
+<div class="rev-card"><div class="rv-label">Orders</div><div class="rv-value">${ACT.orders||'–'}</div><div class="rv-sub">Target: ${TGT.orders}</div></div>
+<div class="rev-card"><div class="rv-label">Conv Rate (Leads→Orders)</div><div class="rv-value">${convLeadsToOrders}${convLeadsToOrders!=='–'?'%':''}</div><div class="rv-sub">Target: ${(TGT.convRate*100).toFixed(1)}%</div></div>
+<div class="rev-card"><div class="rv-label">Conv Rate (Valid PRX→Orders)</div><div class="rv-value">${convValidPrxToOrders}${convValidPrxToOrders!=='–'?'%':''}</div><div class="rv-sub">Target: ${(TGT.validPrxConvRate*100)}%</div></div>
+<div class="rev-card"><div class="rv-label">Revenue (GST)</div><div class="rv-value">${ACT.revenue?fmt(ACT.revenue):'–'}</div><div class="rv-sub">AOV: ${fmt(ACT.aov)}</div></div>
+<div class="rev-card"><div class="rv-label">ROAS (LP Spend)</div><div class="rv-value" style="color:${ACT.revenue?ACT.revenue/lps<1?'#ef4444':'#22c55e':'#94a3b8'}">${roasVal}</div><div class="rv-sub">Target: ${TGT.roas}</div></div>
+<div class="rev-card"><div class="rv-label">CPA</div><div class="rv-value">${cpaVal}</div><div class="rv-sub">Target: ${fmt(TGT.cpa)}</div></div>`;
 
 // ===== LEADS TAB =====
 document.getElementById('lpKpis').innerHTML=`
@@ -854,7 +810,7 @@ document.getElementById('funnelVisual').innerHTML=`
 <div class="funnel-arrow">→</div>
 <div class="funnel-stage"><div class="funnel-box" style="background:linear-gradient(135deg,#22c55e,#16a34a)"><h3>${fmtN(bofL)} leads</h3><p>BOF: Sales & Conversions</p></div><div class="funnel-rate">${fmt(bofL>0?bofS/bofL:0)} CPL</div></div>
 <div class="funnel-arrow">→</div>
-<div class="funnel-stage"><div class="funnel-box" style="background:linear-gradient(135deg,#f59e0b,#d97706)"><h3>${ACT.orders} orders</h3><p>Revenue: ${fmt(ACT.revenue)}</p></div><div class="funnel-rate">${(ACT.convRate*100).toFixed(1)}% conv rate</div></div>`;
+<div class="funnel-stage"><div class="funnel-box" style="background:linear-gradient(135deg,#f59e0b,#d97706)"><h3>${ACT.orders||'–'} orders</h3><p>Revenue: ${ACT.revenue?fmt(ACT.revenue):'Awaiting data'}</p></div><div class="funnel-rate">${ACT.convRate?(ACT.convRate*100).toFixed(1)+'% conv rate':'conv rate N/A'}</div></div>`;
 
 dc('chFnPie');CI['chFnPie']=new Chart(document.getElementById('chFnPie'),{type:'doughnut',data:{labels:['TOF','MOF','BOF'],datasets:[{data:[tofS,mofS,bofS],backgroundColor:['rgba(59,130,246,.8)','rgba(139,92,246,.8)','rgba(34,197,94,.8)'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}}}});
 
@@ -871,20 +827,20 @@ const lowLeadDay=fullDays.reduce((w,d)=>d.ll<w.ll?d:w,fullDays[0]);
 const dfmt=d=>new Date(d.d).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
 
 document.getElementById('insKpis').innerHTML=`
-<div class="kpi-card hl"><div class="kpi-label">Daily Avg Leads</div><div class="kpi-value">${Math.round(adl)}</div><div class="kpi-sub">Need ${Math.round(TGT.leads/31)}/day for target</div></div>
+<div class="kpi-card hl"><div class="kpi-label">Daily Avg Leads</div><div class="kpi-value">${Math.round(adl)}</div><div class="kpi-sub">Need ${Math.round(TGT.leads/30)}/day for target</div></div>
 <div class="kpi-card" style="border-left:4px solid ${acpl<=TGT.cpl?'#22c55e':'#ef4444'}"><div class="kpi-label">CPL Status</div><div class="kpi-value">${fmt(acpl)}</div><div class="kpi-sub">${acpl>TGT.cpl?'Above':'Below'} target ${fmt(TGT.cpl)}</div></div>
 <div class="kpi-card"><div class="kpi-label">Budget Pace</div><div class="kpi-value">${pctI(ts/TGT.budget*100)}</div><div class="kpi-sub">${fmt(ts)} of ${fmt(TGT.budget)}</div></div>
 <div class="kpi-card"><div class="kpi-label">Lead Pace</div><div class="kpi-value">${pctI(ll/TGT.leads*100)}</div><div class="kpi-sub">${fmtN(ll)} of ${fmtN(TGT.leads)}</div></div>
-<div class="kpi-card"><div class="kpi-label">Revenue Pace</div><div class="kpi-value">${pctI(ACT.revenue/TGT.revenue*100)}</div><div class="kpi-sub">${fmt(ACT.revenue)} of ${fmt(TGT.revenue)}</div></div>`;
+<div class="kpi-card"><div class="kpi-label">Revenue Pace</div><div class="kpi-value">${ACT.revenue?pctI(ACT.revenue/TGT.revenue*100):'–'}</div><div class="kpi-sub">${ACT.revenue?fmt(ACT.revenue):'Awaiting data'} of ${fmt(TGT.revenue)}</div></div>`;
 
 // --- Lead Volume Trend ---
 document.getElementById('leadVolStrip').innerHTML=`
 <div class="insight-chip chip-green"><div class="chip-label">Peak Day</div><div class="chip-value">${peakLeadDay.ll} leads</div><div class="chip-sub">${dfmt(peakLeadDay)} — best performance</div></div>
 <div class="insight-chip chip-red"><div class="chip-label">Low Day</div><div class="chip-value">${lowLeadDay.ll} leads</div><div class="chip-sub">${dfmt(lowLeadDay)} — lowest output</div></div>
-<div class="insight-chip chip-blue"><div class="chip-label">Avg Leads/Day</div><div class="chip-value">${Math.round(adl)}</div><div class="chip-sub">Target: ${Math.round(TGT.leads/31)}/day</div></div>
+<div class="insight-chip chip-blue"><div class="chip-label">Avg Leads/Day</div><div class="chip-value">${Math.round(adl)}</div><div class="chip-sub">Target: ${Math.round(TGT.leads/30)}/day</div></div>
 <div class="insight-chip chip-teal"><div class="chip-label">Total (${fd.length} days)</div><div class="chip-value">${fmtN(ll)}</div><div class="chip-sub">${pctI(ll/TGT.leads*100)} of monthly target</div></div>`;
 
-dc('chInsLeadVol');CI['chInsLeadVol']=new Chart(document.getElementById('chInsLeadVol'),{type:'bar',data:{labels:lb,datasets:[{label:'Daily Leads',data:fd.map(d=>d.ll),backgroundColor:fd.map(d=>d.ll>=Math.round(adl)?'rgba(26,138,110,.75)':'rgba(251,146,60,.65)'),borderRadius:5},{label:'Avg ('+Math.round(adl)+')',data:fd.map(()=>Math.round(adl)),type:'line',borderColor:'#94a3b8',borderDash:[5,3],pointRadius:0,fill:false},{label:'Target ('+Math.round(TGT.leads/31)+')',data:fd.map(()=>Math.round(TGT.leads/31)),type:'line',borderColor:'#22c55e',borderDash:[3,3],pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false}},y:{beginAtZero:true}}}});
+dc('chInsLeadVol');CI['chInsLeadVol']=new Chart(document.getElementById('chInsLeadVol'),{type:'bar',data:{labels:lb,datasets:[{label:'Daily Leads',data:fd.map(d=>d.ll),backgroundColor:fd.map(d=>d.ll>=Math.round(adl)?'rgba(26,138,110,.75)':'rgba(251,146,60,.65)'),borderRadius:5},{label:'Avg ('+Math.round(adl)+')',data:fd.map(()=>Math.round(adl)),type:'line',borderColor:'#94a3b8',borderDash:[5,3],pointRadius:0,fill:false},{label:'Target ('+Math.round(TGT.leads/30)+')',data:fd.map(()=>Math.round(TGT.leads/30)),type:'line',borderColor:'#22c55e',borderDash:[3,3],pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false}},y:{beginAtZero:true}}}});
 
 // --- Lead Cost Efficiency ---
 const cplTrend=fd.length>=6?(fd.slice(-3).reduce((s,d)=>s+d.cpl,0)/3)<(fd.slice(0,3).reduce((s,d)=>s+d.cpl,0)/3)?'Decreasing':'Increasing':'Stable';
@@ -943,33 +899,33 @@ document.getElementById('audienceInsights').innerHTML=`
 // --- Optimization Opportunities ---
 document.getElementById('optimizationGrid').innerHTML=`
 <div class="action-card ac-increase"><div class="action-tag">INCREASE BUDGET</div><h4>LP Campaign | 1 Dec + Different Audience</h4><p>Combined ~₹119 avg CPL with 704 leads — your two best campaigns. Increase budget 25-30%. Open Audience South India and "Away from home" audiences are scaling winners.</p></div>
-<div class="action-card ac-increase"><div class="action-tag">RECOMMENDATION</div><h4>Create More Static Creatives</h4><p>Static CPL ${fmt(IMAGE_CPL)} vs Video ${fmt(VIDEO_CPL)}. Only ${IMAGE_CREATIVES_COUNT} static creatives live vs ${VIDEO_CREATIVES_COUNT} video. Create 4-5 new statics around "Samajhdari" and "Struggling with meds" themes.</p></div>
-<div class="action-card ac-run"><div class="action-tag">KEEP ACTIVE</div><h4>NLP Advantage+ Campaign</h4><p>Improving trend: W1 ₹261 → W2 ₹156. Meta's algorithm is optimizing well. Don't touch — let it continue learning. 146 leads so far.</p></div>
-<div class="action-card ac-run"><div class="action-tag">KEEP ACTIVE</div><h4>Awareness + Traffic TOF Campaigns</h4><p>Traffic at ₹0.51 CPC feeds retargeting pool. Awareness building brand. Combined ₹${fmtN(Math.round(tof/1000))}K spend is investment in future LP campaign efficiency.</p></div>
-<div class="action-card ac-decrease"><div class="action-tag">DECREASE BUDGET</div><h4>LP Campaign 2 (Tech-Savvy)</h4><p>Highest spend ₹60.6K but ₹198 CPL — 39% above target. Reduce 30% and reallocate to LP Campaign 1 Dec and Different Audience Sales.</p></div>
-<div class="action-card ac-decrease"><div class="action-tag">DECREASE BUDGET</div><h4>LP Goodflip Data List</h4><p>₹242 CPL with only 78 leads. 71% above target. Reduce 40% unless downstream PRX conversion is significantly better than other campaigns.</p></div>
-<div class="action-card ac-monitor"><div class="action-tag">NEEDS ATTENTION</div><h4>ROAS ${(ACT.revenue/lps).toFixed(2)} — Below Breakeven</h4><p>CPA ${fmt(lps/ACT.orders)} vs AOV ${fmt(ACT.aov)}. First-order unprofitable. Need LTV data to justify, or reduce CPL to ${fmt(TGT.cpl)} to improve unit economics.</p></div>
-<div class="action-card ac-monitor"><div class="action-tag">NEEDS ATTENTION</div><h4>PRX Rate at ${(ACT.prx/ll*100).toFixed(1)}%</h4><p>76% of leads never submit prescriptions. Improve: (1) Sales team response < 5 min, (2) Simplify prescription upload UX, (3) Add WhatsApp prescription submission.</p></div>
-<div class="action-card ac-pause"><div class="action-tag">PAUSE</div><h4>Delivery App & Website Audiences</h4><p>Delivery App: 12 leads at ₹274. Website: 52 leads at ₹255. Combined ₹16.5K for 64 leads. Pause both and redirect budget to top performers.</p></div>
-<div class="action-card ac-pause"><div class="action-tag">PAUSE</div><h4>Low-Volume Creatives (CPL > ₹250)</h4><p>"10 sec meds Video" (₹803/lead, 3 leads), "Carousel" (₹326, 5 leads), "Pillup makes simple" (₹391, 2 leads). Pause all three and save ₹4.8K.</p></div>`;
+<div class="action-card ac-increase"><div class="action-tag">RECOMMENDATION</div><h4>Create More Static Creatives</h4><p>Static CPL ${fmt(IMAGE_CPL)} vs Video ${fmt(VIDEO_CPL)}. Only ${IMAGE_CREATIVES_COUNT} static active vs ${VIDEO_CREATIVES_COUNT} video. Create 3-4 new statics around "Struggling with meds" themes — proven to outperform video on cost.</p></div>
+<div class="action-card ac-run"><div class="action-tag">KEEP ACTIVE</div><h4>LP Campaign | 1 Dec — Strongest Performer</h4><p>₹161 CPL on 266 leads. Best BOF campaign this week. Open Audience | South India delivery is outperforming all other targeting. Maintain or scale budget.</p></div>
+<div class="action-card ac-run"><div class="action-tag">KEEP ACTIVE</div><h4>Awareness + Traffic TOF Campaigns</h4><p>Traffic at ₹${(camps.find(c=>c.n==='Awareness Traffic | 5 May')||{cpc:0.49}).cpc.toFixed(2)} CPC feeds retargeting pool. Awareness building brand. Combined ₹${fmtN(Math.round(tof/1000))}K spend is investment in future LP campaign efficiency.</p></div>
+<div class="action-card ac-decrease"><div class="action-tag">DECREASE BUDGET</div><h4>LP Campaign 2 (Tech-Savvy) — ₹230 CPL</h4><p>₹26K spend but ₹230 CPL — 62% above target. Reduce 30-40% and reallocate to LP Campaign | 1 Dec (₹161 CPL) and Swap this creative (₹151 CPL).</p></div>
+<div class="action-card ac-decrease"><div class="action-tag">DECREASE BUDGET</div><h4>LP LAL Audience — ₹337 CPL</h4><p>₹337 CPL on 26 leads — 137% above target. Second worst CPL among LP campaigns. Reduce 50% or pause unless remarketing data justifies higher CPA.</p></div>
+<div class="action-card ac-monitor"><div class="action-tag">NEEDS ATTENTION</div><h4>CPL at ₹${Math.round(lps/ll)} — 40% Above Target</h4><p>MTD CPL ₹${Math.round(lps/ll)} vs target ₹${TGT.cpl}. Need to shift budget from high-CPL campaigns (LAL ₹337, Tech-Savvy ₹230) to LP 1Dec (₹161) and Swap creative (₹151).</p></div>
+<div class="action-card ac-monitor"><div class="action-tag">NEEDS ATTENTION</div><h4>Revenue Data Pending</h4><p>Coupler revenue integration not yet synced for April. Update ACT.revenue in dashboard config once available from Shopify/CRM. ROAS and CPA metrics unavailable until then.</p></div>
+<div class="action-card ac-pause"><div class="action-tag">PAUSE</div><h4>LP Customer List Campaign — ₹950 CPL</h4><p>Remarketing to existing customers. Only 1 lead at ₹950 CPL on ₹950 spend. Audience is exhausted — pause or replace audience.</p></div>
+<div class="action-card ac-pause"><div class="action-tag">PAUSE</div><h4>Whats Your Choice Creative — ₹391 CPL</h4><p>Worst CPL of all active creatives. Comparison format not driving conversions. Pause immediately to stop wasting ₹6.7K budget.</p></div>`;
 
 // ===== MONTHLY PROGRESS TAB =====
-const daysElapsed=nFull;const daysInMonth=31;const daysPct=daysElapsed/daysInMonth;
+const daysElapsed=nFull;const daysInMonth=30;const daysPct=daysElapsed/daysInMonth;
 const fullDaySpend=fullDays.reduce((s,d)=>s+d.ts,0);const fullDayLpSpend=fullDays.reduce((s,d)=>s+d.lp,0);
 const fullDayLeads=fullDays.reduce((s,d)=>s+d.ll,0);
 const projSpend=Math.round(fullDaySpend/daysElapsed*daysInMonth);
 const projLpSpend=Math.round(fullDayLpSpend/daysElapsed*daysInMonth);
 const projLeads=Math.round(fullDayLeads/daysElapsed*daysInMonth);
-const projPrx=Math.round(ACT.prx/daysElapsed*daysInMonth);
-const projOrders=Math.round(ACT.orders/daysElapsed*daysInMonth);
-const projRev=Math.round(ACT.revenue/daysElapsed*daysInMonth);
+const projPrx=ACT.prx?Math.round(ACT.prx/daysElapsed*daysInMonth):null;
+const projOrders=ACT.orders?Math.round(ACT.orders/daysElapsed*daysInMonth):null;
+const projRev=ACT.revenue?Math.round(ACT.revenue/daysElapsed*daysInMonth):null;
 
 document.getElementById('prKpis').innerHTML=`
-<div class="kpi-card hl"><div class="kpi-label">Days Elapsed</div><div class="kpi-value">${daysElapsed} / 31</div><div class="kpi-sub">${(daysPct*100).toFixed(0)}% of month</div></div>
+<div class="kpi-card hl"><div class="kpi-label">Days Elapsed</div><div class="kpi-value">${daysElapsed} / 30</div><div class="kpi-sub">${(daysPct*100).toFixed(0)}% of month</div></div>
 <div class="kpi-card"><div class="kpi-label">Projected Spend</div><div class="kpi-value">${fmt(projSpend)}</div><div class="kpi-sub">Target: ${fmt(TGT.budget)}</div></div>
 <div class="kpi-card"><div class="kpi-label">Projected Leads</div><div class="kpi-value">${fmtN(projLeads)}</div><div class="kpi-sub">Target: ${fmtN(TGT.leads)}</div></div>
-<div class="kpi-card"><div class="kpi-label">Projected Revenue</div><div class="kpi-value">${fmt(projRev)}</div><div class="kpi-sub">Target: ${fmt(TGT.revenue)}</div></div>
-<div class="kpi-card"><div class="kpi-label">Projected ROAS</div><div class="kpi-value" style="color:${projRev/projSpend>=TGT.roas?'#22c55e':'#ef4444'}">${(projRev/projSpend).toFixed(2)}</div><div class="kpi-sub">Target: ${TGT.roas}</div></div>`;
+<div class="kpi-card"><div class="kpi-label">Projected Revenue</div><div class="kpi-value">${projRev?fmt(projRev):'Awaiting data'}</div><div class="kpi-sub">Target: ${fmt(TGT.revenue)}</div></div>
+<div class="kpi-card"><div class="kpi-label">Projected ROAS</div><div class="kpi-value" style="color:#94a3b8">${projRev?`${(projRev/projSpend).toFixed(2)}`:'–'}</div><div class="kpi-sub">Target: ${TGT.roas}</div></div>`;
 
 function pBar(label,actual,target,projected){
 const pctA=(actual/target*100);const pctP=(projected/target*100);
@@ -982,47 +938,50 @@ document.getElementById('progressBars').innerHTML=
 pBar('Total Spend',fullDaySpend,TGT.budget,projSpend)+
 pBar('LP Spend',fullDayLpSpend,TGT.perfBudget,projLpSpend)+
 pBar('Leads',fullDayLeads,TGT.leads,projLeads)+
-pBar('PRX Received',ACT.prx,TGT.prx,projPrx)+
-pBar('Orders',ACT.orders,TGT.orders,projOrders)+
-pBar('Revenue',ACT.revenue,TGT.revenue,projRev);
+(ACT.prx?pBar('PRX Received',ACT.prx,TGT.prx,projPrx):'<div class="progress-card"><h4>PRX Received</h4><p style="font-size:12px;color:#94a3b8;padding:8px 0">Awaiting data sync</p></div>')+
+(ACT.orders?pBar('Orders',ACT.orders,TGT.orders,projOrders):'<div class="progress-card"><h4>Orders</h4><p style="font-size:12px;color:#94a3b8;padding:8px 0">Awaiting data sync</p></div>')+
+(ACT.revenue?pBar('Revenue',ACT.revenue,TGT.revenue,projRev):'<div class="progress-card"><h4>Revenue</h4><p style="font-size:12px;color:#94a3b8;padding:8px 0">Awaiting data sync</p></div>');
 
 // Cumulative charts
 const cumLeads=[],cumSpend=[],tgtLeadPace=[],tgtSpendPace=[];
 let cl=0,cs=0;
-fd.forEach((d,i)=>{cl+=d.ll;cs+=d.ts;cumLeads.push(cl);cumSpend.push(cs);tgtLeadPace.push(TGT.leads/31*(i+1));tgtSpendPace.push(TGT.budget/31*(i+1))});
+fd.forEach((d,i)=>{cl+=d.ll;cs+=d.ts;cumLeads.push(cl);cumSpend.push(cs);tgtLeadPace.push(TGT.leads/30*(i+1));tgtSpendPace.push(TGT.budget/30*(i+1))});
 
 dc('chPrLeads');CI['chPrLeads']=new Chart(document.getElementById('chPrLeads'),{type:'line',data:{labels:lb,datasets:[{label:'Actual Leads',data:cumLeads,borderColor:'#1a8a6e',backgroundColor:'rgba(26,138,110,.1)',fill:true,tension:.2,pointRadius:3},{label:'Target Pace',data:tgtLeadPace,borderColor:'#94a3b8',borderDash:[5,3],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false}},y:{beginAtZero:true}}}});
 
 dc('chPrSpend');CI['chPrSpend']=new Chart(document.getElementById('chPrSpend'),{type:'line',data:{labels:lb,datasets:[{label:'Actual Spend',data:cumSpend,borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.08)',fill:true,tension:.2,pointRadius:3},{label:'Budget Pace',data:tgtSpendPace,borderColor:'#94a3b8',borderDash:[5,3],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>'₹'+Math.round(v/1000)+'K'}}}}});
 
 // Projections table
+const awActual=fullDays.reduce((s,d)=>s+d.aw+d.en+d.tr,0);
 const metrics=[
 {m:'Total Budget',tgt:TGT.budget,act:fullDaySpend,proj:projSpend},
 {m:'Perf (LP) Spend',tgt:TGT.perfBudget,act:fullDayLpSpend,proj:projLpSpend},
-{m:'Awareness Spend',tgt:TGT.awBudget,act:fullDays.reduce((s,d)=>s+d.aw+d.en+d.tr,0),proj:Math.round(fullDays.reduce((s,d)=>s+d.aw+d.en+d.tr,0)/daysElapsed*31)},
+{m:'Awareness Spend',tgt:TGT.awBudget,act:awActual,proj:Math.round(awActual/daysElapsed*30)},
 {m:'Leads',tgt:TGT.leads,act:fullDayLeads,proj:projLeads},
 {m:'CPL',tgt:TGT.cpl,act:Math.round(fullDayLpSpend/fullDayLeads),proj:Math.round(projLpSpend/projLeads)},
-{m:'PRX Received',tgt:TGT.prx,act:ACT.prx,proj:projPrx},
-{m:'PRX Rate',tgt:TGT.prxRate*100,act:+(ACT.prx/fullDayLeads*100).toFixed(1),proj:+(ACT.prx/fullDayLeads*100).toFixed(1)},
-{m:'Orders',tgt:TGT.orders,act:ACT.orders,proj:projOrders},
-{m:'Conv Rate',tgt:TGT.convRate*100,act:+(ACT.convRate*100).toFixed(1),proj:+(ACT.convRate*100).toFixed(1)},
-{m:'Revenue',tgt:TGT.revenue,act:ACT.revenue,proj:projRev},
-{m:'ROAS',tgt:TGT.roas,act:+(ACT.revenue/fullDayLpSpend).toFixed(2),proj:+(projRev/projLpSpend).toFixed(2)},
-{m:'CPA',tgt:TGT.cpa,act:Math.round(fullDayLpSpend/ACT.orders),proj:Math.round(projLpSpend/projOrders)},
-{m:'AOV',tgt:TGT.aov,act:ACT.aov,proj:Math.round(projRev/projOrders)}
+{m:'PRX Received',tgt:TGT.prx,act:ACT.prx||'–',proj:projPrx||'–'},
+{m:'PRX Rate',tgt:TGT.prxRate*100,act:'N/A',proj:'N/A'},
+{m:'Orders',tgt:TGT.orders,act:ACT.orders||'–',proj:projOrders||'–'},
+{m:'Conv Rate',tgt:TGT.convRate*100,act:'N/A',proj:'N/A'},
+{m:'Revenue',tgt:TGT.revenue,act:ACT.revenue||'–',proj:projRev||'–'},
+{m:'ROAS',tgt:TGT.roas,act:'N/A',proj:'N/A'},
+{m:'AOV',tgt:TGT.aov,act:ACT.aov,proj:ACT.aov}
 ];
 let prTb='';
 metrics.forEach(r=>{
 const isMoney=['Total Budget','Perf (LP) Spend','Awareness Spend','Revenue','CPA','AOV','CPL'].includes(r.m);
 const isPct=['PRX Rate','Conv Rate'].includes(r.m);
 const isRatio=r.m==='ROAS';
-const fv=v=>isMoney?fmt(v):isPct?v+'%':isRatio?v.toFixed(2):fmtN(v);
-const pctOfTgt=isRatio||isPct?(r.act/r.tgt*100):(r.act/r.tgt*100);
+const isNA=(v)=>v===null||v===undefined||v==='N/A'||v==='–';
+const fv=v=>{if(isNA(v))return'–';return isMoney?fmt(v):isPct?v+'%':isRatio?(+v).toFixed(2):fmtN(v);};
+const pctNum=isNA(r.act)||isNA(r.tgt)?null:(+r.act/+r.tgt*100);
+const pctStr=pctNum==null?'–':pctNum.toFixed(0)+'%';
 const isGoodIfLow=['CPL','CPA'].includes(r.m);
 let status;
-if(isGoodIfLow){status=r.proj<=r.tgt*1.1?'<span class="badge badge-green">On Track</span>':r.proj<=r.tgt*1.3?'<span class="badge badge-yellow">Watch</span>':'<span class="badge badge-red">Behind</span>'}
-else{status=r.proj>=r.tgt*.9?'<span class="badge badge-green">On Track</span>':r.proj>=r.tgt*.75?'<span class="badge badge-yellow">Watch</span>':'<span class="badge badge-red">Behind</span>'}
-prTb+=`<tr><td><strong>${r.m}</strong></td><td class="num">${fv(r.tgt)}</td><td class="num">${fv(r.act)}</td><td class="num">${fv(r.proj)}</td><td class="num">${pctOfTgt.toFixed(0)}%</td><td>${status}</td></tr>`});
+if(isNA(r.proj)||isNA(r.tgt)){status='<span class="badge badge-yellow">N/A</span>'}
+else if(isGoodIfLow){status=+r.proj<=+r.tgt*1.1?'<span class="badge badge-green">On Track</span>':+r.proj<=+r.tgt*1.3?'<span class="badge badge-yellow">Watch</span>':'<span class="badge badge-red">Behind</span>'}
+else{status=+r.proj>=+r.tgt*.9?'<span class="badge badge-green">On Track</span>':+r.proj>=+r.tgt*.75?'<span class="badge badge-yellow">Watch</span>':'<span class="badge badge-red">Behind</span>'}
+prTb+=`<tr><td><strong>${r.m}</strong></td><td class="num">${fv(r.tgt)}</td><td class="num">${fv(r.act)}</td><td class="num">${fv(r.proj)}</td><td class="num">${pctStr}</td><td>${status}</td></tr>`});
 document.querySelector('#tblProjections tbody').innerHTML=prTb;
 
 // ===== AWARENESS TAB =====
