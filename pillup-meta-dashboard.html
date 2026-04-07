@@ -180,11 +180,11 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f5f7f
   </div>
   <div class="header-right">
     <div class="date-filter">
-      <label>From</label><input type="date" id="dateFrom" value="2026-03-01" min="2026-03-01" max="2026-03-19">
-      <label>To</label><input type="date" id="dateTo" value="2026-03-19" min="2026-03-01" max="2026-03-19">
+      <label>From</label><input type="date" id="dateFrom" value="2026-03-01" min="2026-03-01" max="2026-03-26">
+      <label>To</label><input type="date" id="dateTo" value="2026-03-26" min="2026-03-01" max="2026-03-26">
       <button class="btn-apply" onclick="applyFilter()">Apply</button>
     </div>
-    <div class="refresh-badge" id="refreshBadge">Last sync: Mar 19, 12:00 AM<br><span style="color:#1a8a6e;font-weight:600">Auto-updates daily</span></div>
+    <div class="refresh-badge" id="refreshBadge">Last sync: Mar 30, 12:00 AM<br><span style="color:#f59e0b;font-weight:600">Coupler data thru Mar 26</span></div>
   </div>
 </div>
 
@@ -203,7 +203,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f5f7f
 
 <!-- ====== OVERVIEW TAB ====== -->
 <div class="tab-content active" id="tab-overview">
-  <div id="partialBanner" style="padding:10px 16px;background:#e0f2fe;border:1px solid #7dd3fc;border-radius:8px;font-size:12px;color:#0369a1;margin-bottom:14px;display:none"><strong>Note:</strong> Mar 16 data is partial (synced 3:31 AM). Full-day numbers will be higher.</div>
+  <div id="partialBanner" style="padding:10px 16px;background:#e0f2fe;border:1px solid #7dd3fc;border-radius:8px;font-size:12px;color:#0369a1;margin-bottom:14px;display:none"><strong>Note:</strong> Mar 26 data is partial (synced 3:31 AM). Full-day numbers will be higher.</div>
   <div class="kpi-row" id="ovKpis"></div>
   <div class="chart-row">
     <div class="chart-box"><h3>Daily Spend by Type</h3><div class="chart-container"><canvas id="chOvSpend"></canvas></div></div>
@@ -389,7 +389,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f5f7f
   </div>
   <div class="section">
     <div class="section-title"><span class="dot"></span> March Projections vs Targets</div>
-    <div class="table-wrap"><table class="dt" id="tblProjections"><thead><tr><th>Metric</th><th class="num">Target</th><th class="num">Achieved (16 days)</th><th class="num">Projected (31 days)</th><th class="num">% of Target</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+    <div class="table-wrap"><table class="dt" id="tblProjections"><thead><tr><th>Metric</th><th class="num">Target</th><th class="num">Achieved (26 days)</th><th class="num">Projected (31 days)</th><th class="num">% of Target</th><th>Status</th></tr></thead><tbody></tbody></table></div>
   </div>
 </div>
 
@@ -411,93 +411,109 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f5f7f
 <script>
 // ===== DATA =====
 const D = [
-  {d:"2026-03-01",ts:28691.55,lp:22169.48,aw:1268.52,en:2583.88,tr:2669.67,tl:126,ll:126,ctr:1.47,wctr:1.17,cpc:5.06,cpl:175.95},
-  {d:"2026-03-02",ts:26526.38,lp:20293.89,aw:1190.15,en:2381.28,tr:2661.06,tl:124,ll:124,ctr:1.74,wctr:1.50,cpc:6.15,cpl:163.66},
-  {d:"2026-03-03",ts:28058.89,lp:21763.39,aw:1207.05,en:2380.01,tr:2708.44,tl:126,ll:126,ctr:2.72,wctr:1.48,cpc:6.06,cpl:172.73},
-  {d:"2026-03-04",ts:26556.70,lp:20791.14,aw:1180.90,en:2198.65,tr:2386.01,tl:116,ll:116,ctr:1.37,wctr:1.14,cpc:5.32,cpl:179.23},
-  {d:"2026-03-05",ts:23640.28,lp:17893.38,aw:1204.25,en:2316.91,tr:2225.74,tl:109,ll:109,ctr:1.56,wctr:1.29,cpc:6.85,cpl:164.16},
-  {d:"2026-03-06",ts:23667.86,lp:17439.00,aw:1167.28,en:2477.40,tr:2584.18,tl:115,ll:115,ctr:1.60,wctr:1.24,cpc:5.93,cpl:151.64},
-  {d:"2026-03-07",ts:23351.16,lp:16842.79,aw:1181.85,en:2396.81,tr:2929.71,tl:114,ll:113,ctr:1.90,wctr:1.39,cpc:6.48,cpl:149.05},
-  {d:"2026-03-08",ts:24913.32,lp:18736.80,aw:1253.70,en:2264.61,tr:2658.21,tl:144,ll:144,ctr:1.53,wctr:1.23,cpc:6.53,cpl:130.12},
-  {d:"2026-03-09",ts:25398.56,lp:18920.39,aw:1197.63,en:2636.48,tr:2644.06,tl:117,ll:117,ctr:2.17,wctr:1.57,cpc:5.81,cpl:161.71},
-  {d:"2026-03-10",ts:27303.76,lp:20955.77,aw:1199.48,en:2414.67,tr:2733.84,tl:113,ll:113,ctr:1.56,wctr:1.21,cpc:7.31,cpl:185.45},
-  {d:"2026-03-11",ts:27764.00,lp:21659.13,aw:1195.16,en:2352.79,tr:2556.92,tl:137,ll:137,ctr:1.36,wctr:1.08,cpc:8.38,cpl:158.10},
-  {d:"2026-03-12",ts:27993.42,lp:21789.11,aw:1187.16,en:2341.43,tr:2675.72,tl:136,ll:136,ctr:1.19,wctr:0.87,cpc:7.95,cpl:160.21},
-  {d:"2026-03-13",ts:26831.65,lp:20777.07,aw:1196.47,en:2342.45,tr:2515.66,tl:114,ll:113,ctr:1.41,wctr:1.13,cpc:8.43,cpl:183.87},
-  {d:"2026-03-14",ts:26110.07,lp:20001.13,aw:1170.40,en:2415.79,tr:2522.75,tl:107,ll:107,ctr:1.71,wctr:1.40,cpc:6.23,cpl:186.93},
-  {d:"2026-03-15",ts:28147.01,lp:21488.19,aw:1259.69,en:2572.73,tr:2826.40,tl:117,ll:117,ctr:3.29,wctr:2.98,cpc:6.83,cpl:183.66},
-  {d:"2026-03-16",ts:4113.38,lp:2986.85,aw:200.24,en:476.82,tr:449.47,tl:23,ll:23,ctr:1.19,wctr:0.89,cpc:7.55,cpl:129.86,partial:true}
+  {d:"2026-03-01",ts:28691.55,lp:22169.48,aw:1268.52,en:2583.88,tr:2669.67,tl:126,ll:126,ctr:1.4,wctr:1.13,cpc:5.89,cpl:175.95},
+  {d:"2026-03-02",ts:26526.38,lp:20293.89,aw:1190.15,en:2381.28,tr:2661.06,tl:124,ll:124,ctr:1.49,wctr:1.24,cpc:6.22,cpl:163.66},
+  {d:"2026-03-03",ts:28058.89,lp:21763.39,aw:1207.05,en:2380.01,tr:2708.44,tl:126,ll:126,ctr:1.43,wctr:1.18,cpc:6.33,cpl:172.73},
+  {d:"2026-03-04",ts:26556.70,lp:20791.14,aw:1180.90,en:2198.65,tr:2386.01,tl:116,ll:116,ctr:1.36,wctr:1.11,cpc:6.21,cpl:179.23},
+  {d:"2026-03-05",ts:23640.28,lp:17893.38,aw:1204.25,en:2316.91,tr:2225.74,tl:109,ll:109,ctr:1.32,wctr:1.07,cpc:7.18,cpl:164.16},
+  {d:"2026-03-06",ts:23667.86,lp:17439.00,aw:1167.28,en:2477.40,tr:2584.18,tl:115,ll:115,ctr:1.38,wctr:1.09,cpc:7.12,cpl:151.64},
+  {d:"2026-03-07",ts:23351.16,lp:16842.79,aw:1181.85,en:2396.81,tr:2929.71,tl:114,ll:113,ctr:1.55,wctr:1.23,cpc:6.2,cpl:149.05},
+  {d:"2026-03-08",ts:24913.32,lp:18736.80,aw:1253.70,en:2264.61,tr:2658.21,tl:144,ll:144,ctr:1.43,wctr:1.13,cpc:7.18,cpl:130.12},
+  {d:"2026-03-09",ts:25398.56,lp:18920.39,aw:1197.63,en:2636.48,tr:2644.06,tl:117,ll:117,ctr:1.42,wctr:1.12,cpc:6.85,cpl:161.71},
+  {d:"2026-03-10",ts:27303.76,lp:20955.77,aw:1199.48,en:2414.67,tr:2733.84,tl:113,ll:113,ctr:1.36,wctr:1.06,cpc:7.19,cpl:185.45},
+  {d:"2026-03-11",ts:27764.00,lp:21659.13,aw:1195.16,en:2352.79,tr:2556.92,tl:137,ll:137,ctr:1.18,wctr:0.9,cpc:8.62,cpl:158.1},
+  {d:"2026-03-12",ts:27993.42,lp:21789.11,aw:1187.16,en:2341.43,tr:2675.72,tl:136,ll:136,ctr:1.11,wctr:0.84,cpc:8.55,cpl:160.21},
+  {d:"2026-03-13",ts:26831.65,lp:20777.07,aw:1196.47,en:2342.45,tr:2515.66,tl:114,ll:113,ctr:1.11,wctr:0.83,cpc:8.89,cpl:183.87},
+  {d:"2026-03-14",ts:26110.07,lp:20001.13,aw:1170.40,en:2415.79,tr:2522.75,tl:107,ll:107,ctr:1.13,wctr:0.86,cpc:8.73,cpl:186.93},
+  {d:"2026-03-15",ts:28211.63,lp:21524.57,aw:1266.84,en:2578.48,tr:2841.74,tl:117,ll:117,ctr:1.14,wctr:0.85,cpc:8.91,cpl:183.97},
+  {d:"2026-03-16",ts:25445.85,lp:19363.73,aw:1191.35,en:2357.91,tr:2532.86,tl:123,ll:123,ctr:1.21,wctr:0.9,cpc:8.32,cpl:157.43},
+  {d:"2026-03-17",ts:26461.62,lp:20689.92,aw:1188.75,en:2342.99,tr:2239.96,tl:127,ll:127,ctr:1.15,wctr:0.86,cpc:8.03,cpl:162.91},
+  {d:"2026-03-18",ts:25257.07,lp:19365.20,aw:1193.59,en:2403.85,tr:2294.43,tl:104,ll:104,ctr:1.05,wctr:0.77,cpc:8.1,cpl:186.2},
+  {d:"2026-03-19",ts:26218.86,lp:19626.08,aw:1202.58,en:2353.94,tr:3036.26,tl:101,ll:101,ctr:1.0,wctr:0.74,cpc:9.14,cpl:194.32},
+  {d:"2026-03-20",ts:26077.64,lp:20248.01,aw:1188.82,en:2364.10,tr:2276.71,tl:92,ll:92,ctr:0.9,wctr:0.66,cpc:8.69,cpl:220.09},
+  {d:"2026-03-21",ts:26064.85,lp:19811.57,aw:1166.98,en:2336.16,tr:2750.14,tl:81,ll:81,ctr:0.96,wctr:0.7,cpc:8.98,cpl:244.59},
+  {d:"2026-03-22",ts:29495.32,lp:22636.76,aw:1261.70,en:2612.69,tr:2984.17,tl:122,ll:122,ctr:1.05,wctr:0.78,cpc:9.05,cpl:185.55},
+  {d:"2026-03-23",ts:26943.83,lp:20529.45,aw:1185.42,en:2417.56,tr:2811.40,tl:105,ll:105,ctr:1.12,wctr:0.8,cpc:8.1,cpl:195.52},
+  {d:"2026-03-24",ts:28738.08,lp:22532.47,aw:1191.43,en:2468.13,tr:2546.05,tl:108,ll:108,ctr:1.23,wctr:0.86,cpc:7.68,cpl:208.63},
+  {d:"2026-03-25",ts:25788.42,lp:19707.65,aw:1189.22,en:2324.83,tr:2566.72,tl:101,ll:101,ctr:1.48,wctr:1.27,cpc:6.69,cpl:195.12},
+  {d:"2026-03-26",ts:8963.97,lp:7179.05,aw:348.59,en:706.24,tr:730.09,tl:22,ll:22,ctr:1.35,wctr:1.13,cpc:7.03,cpl:326.32,partial:true}
 ];
 
 // Ordered: TOF → MOF → BOF
 const camps = [
-  {n:"Awareness Campaign | 2 May",t:"TOF",sp:18259.93,l:0,cpl:null,ctr:0.12,wctr:0.06,cpc:3.09},
-  {n:"Awareness Engagement | 2 May",t:"TOF",sp:36552.71,l:0,cpl:null,ctr:1.32,wctr:1.08,cpc:3.86},
-  {n:"Awareness Traffic | 5 May",t:"TOF",sp:39747.84,l:2,cpl:null,ctr:3.93,wctr:3.14,cpc:0.51},
-  {n:"LP MOF Campaign | 6 May",t:"MOF",sp:45469.58,l:250,cpl:181.88,ctr:1.04,wctr:0.74,cpc:10.22},
-  {n:"LP LAL Audience | 13 Aug",t:"MOF",sp:37991.46,l:199,cpl:190.91,ctr:1.74,wctr:1.35,cpc:8.08},
-  {n:"LP Customer List | 11 Nov",t:"MOF",sp:30263.02,l:153,cpl:197.80,ctr:3.01,wctr:2.55,cpc:11.98},
-  {n:"LP Goodflip Data List",t:"MOF",sp:18914.29,l:78,cpl:242.49,ctr:1.39,wctr:1.03,cpc:12.20},
-  {n:"LP Campaign | 1 Dec",t:"BOF",sp:39702.88,l:343,cpl:115.75,ctr:2.15,wctr:0.96,cpc:5.58},
-  {n:"LP Different Audience Sales",t:"BOF",sp:44335.15,l:361,cpl:122.81,ctr:1.10,wctr:0.90,cpc:10.03},
-  {n:"LP Campaign 2 (Tech-Savvy)",t:"BOF",sp:60601.17,l:306,cpl:198.04,ctr:0.94,wctr:0.70,cpc:9.57},
-  {n:"NLP Advantage+ | 8 May",t:"BOF",sp:27229.96,l:146,cpl:186.51,ctr:1.04,wctr:0.83,cpc:8.36}
+  {n:"Awareness Campaign | 2 May",t:"TOF",sp:30375.27,l:0,cpl:null,ctr:0.09,wctr:0.06,cpc:3.47},
+  {n:"Awareness Engagement | 2 May",t:"TOF",sp:60770.04,l:0,cpl:null,ctr:1.3,wctr:1.11,cpc:3.74},
+  {n:"Awareness Traffic | 5 May",t:"TOF",sp:66082.50,l:2,cpl:33041.25,ctr:3.69,wctr:3.17,cpc:0.6},
+  {n:"LP Customer List | 11 Nov",t:"MOF",sp:52131.20,l:261,cpl:199.74,ctr:1.77,wctr:1.87,cpc:12.26},
+  {n:"LP Goodflip Data List",t:"MOF",sp:29326.11,l:126,cpl:232.75,ctr:0.96,wctr:0.79,cpc:13.26},
+  {n:"LP LAL Audience | 13 Aug",t:"MOF",sp:63964.77,l:283,cpl:226.09,ctr:1.21,wctr:1.02,cpc:10.0},
+  {n:"LP MOF Campaign | 6 May",t:"MOF",sp:66744.36,l:339,cpl:196.89,ctr:0.76,wctr:0.72,cpc:10.11},
+  {n:"LP Campaign 2 (Tech-Savvy)",t:"BOF",sp:101876.70,l:493,cpl:206.65,ctr:0.78,wctr:0.62,cpc:9.86},
+  {n:"LP Campaign | 1 Dec",t:"BOF",sp:68652.90,l:533,cpl:128.80,ctr:1.45,wctr:0.96,cpc:5.95},
+  {n:"LP Different Audience Sales",t:"BOF",sp:77656.43,l:583,cpl:133.20,ctr:0.88,wctr:0.85,cpc:9.84},
+  {n:"NLP Advantage+ | 8 May",t:"BOF",sp:52894.46,l:281,cpl:188.24,ctr:0.84,wctr:0.74,cpc:7.82}
 ];
 
 const auds = [
-  {n:"Open Audience | South India",sp:39702.88,l:343,cpl:115.75,ctr:2.15},
-  {n:"Away from home | 25 June",sp:41044.78,l:349,cpl:117.61,ctr:1.21},
-  {n:"Engaged Meta Audience",sp:32220.79,l:198,cpl:162.73,ctr:0.53},
-  {n:"NLP Advantage+",sp:27229.96,l:146,cpl:186.51,ctr:1.04},
-  {n:"LAL Customer List",sp:37991.46,l:199,cpl:190.91,ctr:1.74},
-  {n:"Order Customer List",sp:30263.02,l:153,cpl:197.80,ctr:3.01},
-  {n:"Tech-Savvy Individuals",sp:60601.17,l:306,cpl:198.04,ctr:0.94},
-  {n:"Customer List | Open Aud",sp:18914.29,l:78,cpl:242.49,ctr:1.39},
-  {n:"Website Audience",sp:13248.79,l:52,cpl:254.78,ctr:1.30},
+  {n:"Away from home | 25 June",sp:74366.06,l:571,cpl:130.24,ctr:0.91},
+  {n:"Open Audience | South India",sp:68652.90,l:533,cpl:128.80,ctr:1.45},
+  {n:"Engaged Meta Audience",sp:53017.64,l:284,cpl:186.68,ctr:0.48},
+  {n:"NLP Advantage+",sp:52894.46,l:281,cpl:188.24,ctr:0.84},
+  {n:"Order Customer List",sp:52131.20,l:261,cpl:199.74,ctr:1.77},
+  {n:"Tech-Savvy Individuals",sp:101876.70,l:493,cpl:206.65,ctr:0.78},
+  {n:"LAL Customer List",sp:63964.77,l:283,cpl:226.09,ctr:1.21},
+  {n:"Customer List | Open Aud",sp:29326.11,l:126,cpl:232.75,ctr:0.96},
+  {n:"Website Audience",sp:13726.72,l:55,cpl:249.58,ctr:1.06},
   {n:"Delivery App",sp:3290.37,l:12,cpl:274.20,ctr:0.68}
 ];
 
 // ty: 'img'/'vid'/'car', freq=frequency, engRate=engagement%, hookRate=3sec hook retention% (video), fatigue/status/action=performance labels, bench=benchmark CPL, copy=ad copy, why=analysis
 const cres = [
-  {n:"All his meds video",sp:127793,l:771,cpl:165.75,ctr:1.28,ty:'vid',freq:3.8,engRate:4.8,hookRate:42,fatigue:'high',status:'top',action:'optimize',bench:165,ig:'DM7gTR9vGfm',live:true,
+  {n:"All his meds video",sp:177237,l:1030,cpl:172.07,ctr:1.39,ty:'vid',freq:4.2,engRate:4.8,hookRate:42,fatigue:'high',status:'top',action:'optimize',bench:165,ig:'DM7gTR9vGfm',live:true,
    copy:"Managing multiple medications for your parents? PillUp organizes all daily meds into one easy pouch — delivered to your door.",
-   why:"Pain-point messaging resonates deeply with 25-44 caregivers. Emotional hook + clear solution drives highest lead volume. Frequency 3.8 is a concern — needs fresh variants."},
-  {n:"Life without pillup video",sp:58809,l:328,cpl:179.30,ctr:0.49,ty:'vid',freq:2.6,engRate:2.1,hookRate:28,fatigue:'medium',status:'good',action:'optimize',bench:165,ig:'',live:true,
+   why:"Pain-point messaging resonates deeply with 25-44 caregivers. Emotional hook + clear solution drives highest lead volume. Frequency 4.2 is a concern — needs fresh variants."},
+  {n:"Life without pillup video",sp:128436,l:635,cpl:202.26,ctr:0.67,ty:'vid',freq:3.1,engRate:2.1,hookRate:28,fatigue:'medium',status:'good',action:'optimize',bench:165,ig:'',live:true,
    copy:"What does life look like without PillUp? Chaos, confusion, missed doses. There's a better way.",
-   why:"Negative framing creates urgency. Low CTR (0.49%) suggests weak hook — but those who click convert well."},
-  {n:"Parents Meds Video",sp:35868,l:196,cpl:183.00,ctr:1.04,ty:'vid',freq:2.2,engRate:3.6,hookRate:38,fatigue:'low',status:'good',action:'maintain',bench:165,ig:'',live:true,
+   why:"Negative framing creates urgency. Low CTR (0.67%) suggests weak hook — but those who click convert well."},
+  {n:"Parents Meds Video",sp:46952,l:233,cpl:201.51,ctr:1.02,ty:'vid',freq:2.5,engRate:3.6,hookRate:38,fatigue:'low',status:'avg',action:'optimize',bench:165,ig:'',live:true,
    copy:"Your parents deserve better medication management. PillUp sorts, packs & delivers daily pouches.",
    why:"Targets 'caring for parents' emotion — strong with 30-44 demographic. Moderate CPL, steady volume. Room to scale."},
-  {n:"Samajhdari_static",sp:26963,l:242,cpl:111.42,ctr:1.08,ty:'img',freq:1.9,engRate:2.8,hookRate:null,fatigue:'low',status:'top',action:'scale',bench:135,ig:'DRRqS5tgEhR',live:true,
+  {n:"Samajhdari_static",sp:34821,l:319,cpl:109.16,ctr:0.60,ty:'img',freq:2.2,engRate:2.8,hookRate:null,fatigue:'low',status:'top',action:'scale',bench:135,ig:'DRRqS5tgEhR',live:true,
    copy:"Samajhdari isse kehte hain — sab dawai ek pouch mein, roz ghar pe.",
-   why:"Hindi emotional appeal with cultural relevance. Best CPL ₹111 — 18% below benchmark. Scale immediately."},
-  {n:"Struggling with meds Static",sp:16350,l:139,cpl:117.62,ctr:1.09,ty:'img',freq:1.7,engRate:2.5,hookRate:null,fatigue:'low',status:'top',action:'scale',bench:135,ig:'DKyh5miA6GF',live:true,
+   why:"Hindi emotional appeal with cultural relevance. Best CPL ₹109 — 19% below benchmark. Scale immediately."},
+  {n:"Struggling with meds Static",sp:32582,l:243,cpl:134.08,ctr:1.08,ty:'img',freq:2.0,engRate:2.5,hookRate:null,fatigue:'low',status:'top',action:'scale',bench:135,ig:'DKyh5miA6GF',live:true,
    copy:"Struggling to manage multiple medications every day? There's a simpler way — PillUp daily medicine pouches.",
-   why:"Direct problem statement creates relatability. 13% below benchmark CPL. Low frequency = headroom to scale."},
-  {n:"Daily Meds pouch video",sp:11044,l:43,cpl:256.83,ctr:1.58,ty:'vid',freq:1.5,engRate:5.2,hookRate:45,fatigue:'low',status:'poor',action:'optimize',bench:165,ig:'',live:true,
-   copy:"See how PillUp organizes your daily medications into convenient, pre-sorted pouches.",
-   why:"High engagement (5.2%) and hook rate (45%) — users interested. ₹257 CPL = landing page mismatch issue."},
-  {n:"All meds in one video",sp:6806,l:34,cpl:200.18,ctr:0.78,ty:'vid',freq:1.3,engRate:2.9,hookRate:31,fatigue:'low',status:'avg',action:'test',bench:165,ig:'',live:true,
-   copy:"All your medications, sorted and delivered in one pouch. That's PillUp.",
-   why:"Feature-focused < problem-focused. CPL 21% above benchmark. Needs stronger opening hook."},
-  {n:"Testimonial video",sp:5933,l:22,cpl:269.69,ctr:1.43,ty:'vid',freq:1.4,engRate:6.1,hookRate:52,fatigue:'low',status:'poor',action:'optimize',bench:165,ig:'DRhJNV8gMKP',live:true,
-   copy:"Real PillUp customer shares how managing family medications became stress-free.",
-   why:"Highest hook rate (52%) & engagement (6.1%). ₹270 CPL = post-hook content isn't converting. Fix CTA."},
-  {n:"Everyday meds video",sp:5343,l:28,cpl:190.82,ctr:0.74,ty:'vid',freq:1.2,engRate:2.3,hookRate:26,fatigue:'low',status:'avg',action:'test',bench:165,ig:'DVvo9npAJZy',live:true,
+   why:"Direct problem statement creates relatability. Below benchmark CPL. Low frequency = headroom to scale."},
+  {n:"Everyday meds video",sp:49128,l:247,cpl:198.9,ctr:0.57,ty:'vid',freq:2.1,engRate:2.3,hookRate:26,fatigue:'low',status:'avg',action:'test',bench:165,ig:'DVvo9npAJZy',live:true,
    copy:"Everyday medication management made simple. Right meds, right time, every day.",
    why:"Lowest hook rate (26%) — 74% scroll past. Generic framing. Needs complete creative refresh."},
-  {n:"Switch to Pillup Static",sp:4525,l:19,cpl:238.13,ctr:1.70,ty:'img',freq:1.1,engRate:3.4,hookRate:null,fatigue:'low',status:'poor',action:'pause',bench:135,ig:'DPN4KXpAMC9',live:true,
+  {n:"Daily Meds pouch video",sp:16539,l:67,cpl:246.86,ctr:1.46,ty:'vid',freq:1.7,engRate:5.2,hookRate:45,fatigue:'low',status:'poor',action:'optimize',bench:165,ig:'',live:true,
+   copy:"See how PillUp organizes your daily medications into convenient, pre-sorted pouches.",
+   why:"High engagement (5.2%) and hook rate (45%) — users interested. High CPL = landing page mismatch issue."},
+  {n:"All meds in one video",sp:9738,l:54,cpl:180.34,ctr:0.77,ty:'vid',freq:1.5,engRate:2.9,hookRate:31,fatigue:'low',status:'avg',action:'test',bench:165,ig:'',live:true,
+   copy:"All your medications, sorted and delivered in one pouch. That's PillUp.",
+   why:"Feature-focused < problem-focused. CPL above benchmark. Needs stronger opening hook."},
+  {n:"Testimonial video",sp:6065,l:22,cpl:275.68,ctr:1.29,ty:'vid',freq:1.5,engRate:6.1,hookRate:52,fatigue:'low',status:'poor',action:'optimize',bench:165,ig:'DRhJNV8gMKP',live:true,
+   copy:"Real PillUp customer shares how managing family medications became stress-free.",
+   why:"Highest hook rate (52%) & engagement (6.1%). High CPL = post-hook content isn't converting. Fix CTA."},
+  {n:"Switch to Pillup Static",sp:4525,l:19,cpl:238.16,ctr:1.70,ty:'img',freq:1.2,engRate:3.4,hookRate:null,fatigue:'low',status:'poor',action:'pause',bench:135,ig:'DPN4KXpAMC9',live:true,
    copy:"Switch to PillUp — Medication management, simplified.",
-   why:"High CTR (1.70%) but direct sell doesn't convert. 76% above benchmark. Rework with problem-first messaging."},
-  {n:"10 sec meds Video",sp:2410,l:3,cpl:803.20,ctr:1.37,ty:'vid',freq:0.8,engRate:4.5,hookRate:55,fatigue:'low',status:'critical',action:'pause',bench:165,ig:'',live:true,
+   why:"High CTR (1.70%) but direct sell doesn't convert. Above benchmark. Rework with problem-first messaging."},
+  {n:"How pillup works video",sp:4284,l:12,cpl:357.01,ctr:0.58,ty:'vid',freq:0.9,engRate:2.0,hookRate:30,fatigue:'low',status:'poor',action:'test',bench:165,ig:'',live:true,
+   copy:"See how PillUp works — from ordering to daily medication delivery.",
+   why:"New creative, limited data. High CPL but low spend. Monitor for 1 more week."},
+  {n:"10 sec meds Video",sp:2410,l:3,cpl:803.33,ctr:1.10,ty:'vid',freq:0.8,engRate:4.5,hookRate:55,fatigue:'low',status:'critical',action:'pause',bench:165,ig:'',live:true,
    copy:"Quick look: How PillUp organizes all your meds into one daily pouch.",
-   why:"Highest hook rate (55%) but worst CPL (₹803). Too short to build trust for health decisions. Pause."},
-  {n:"Let Pillup Care Carousel",sp:1630,l:5,cpl:326.03,ctr:6.20,ty:'car',freq:0.6,engRate:8.2,hookRate:null,fatigue:'low',status:'poor',action:'test',bench:150,ig:'DSZy2yYgIIQ',live:true,
+   why:"Highest hook rate (55%) but worst CPL. Too short to build trust for health decisions. Pause."},
+  {n:"New pack video",sp:2073,l:5,cpl:414.53,ctr:0.88,ty:'vid',freq:0.5,engRate:3.0,hookRate:35,fatigue:'low',status:'poor',action:'test',bench:165,ig:'',live:true,
+   copy:"New PillUp packaging — same great medication management, better experience.",
+   why:"New creative, limited data. High CPL on small sample. Needs more spend to evaluate fairly."},
+  {n:"Let Pillup Care Carousel",sp:1647,l:6,cpl:274.5,ctr:2.15,ty:'car',freq:0.6,engRate:8.2,hookRate:null,fatigue:'low',status:'poor',action:'test',bench:150,ig:'DSZy2yYgIIQ',live:true,
    copy:"Let PillUp take care of your medication management. Swipe to see how.",
-   why:"Highest CTR (6.2%) & engagement (8.2%). ₹326 CPL = CTA on last card isn't converting. Fix CTA placement."},
-  {n:"Pillup makes simple static",sp:784,l:2,cpl:390.74,ctr:0.56,ty:'img',freq:0.5,engRate:1.2,hookRate:null,fatigue:'low',status:'critical',action:'pause',bench:135,ig:'',live:true,
+   why:"Highest engagement (8.2%). High CPL = CTA on last card isn't converting. Fix CTA placement."},
+  {n:"Pillup makes simple static",sp:781,l:2,cpl:390.5,ctr:0.56,ty:'img',freq:0.5,engRate:1.2,hookRate:null,fatigue:'low',status:'critical',action:'pause',bench:135,ig:'',live:true,
    copy:"PillUp makes medication management simple. Try it today.",
-   why:"Generic messaging. Lowest engagement (1.2%). Only 2 leads at ₹391 CPL — 190% above benchmark. Replace."},
+   why:"Generic messaging. Lowest engagement (1.2%). Only 2 leads at high CPL. Replace."},
   // === PAUSED CREATIVES ===
   {n:"Smart pouch video",sp:3200,l:14,cpl:228.57,ctr:0.92,ty:'vid',freq:1.0,engRate:3.1,hookRate:35,fatigue:'low',status:'avg',action:'review',bench:165,ig:'DSpNzLpAD17',live:false,
    copy:"Watch how PillUp's smart pouch system organizes daily medications automatically.",
@@ -544,33 +560,30 @@ const IMAGE_SPEND = IMAGE_CREATIVES.reduce((s,c)=>s+c.sp,0);
 const VIDEO_CPL = VIDEO_LEADS>0?VIDEO_SPEND/VIDEO_LEADS:null;
 const IMAGE_CPL = IMAGE_LEADS>0?IMAGE_SPEND/IMAGE_LEADS:null;
 
-// Placement breakdown (Meta Ads Manager - Mar 1-16)
+// Placement breakdown (Meta Ads Manager - Mar 1-22)
 const places = [
-  {n:"Facebook Feed",sp:142000,l:892,cpl:159.19,ctr:1.42},
-  {n:"Instagram Feed",sp:89000,l:498,cpl:178.71,ctr:1.68},
-  {n:"Instagram Stories",sp:52000,l:218,cpl:238.53,ctr:0.89},
-  {n:"Facebook Reels",sp:28000,l:142,cpl:197.18,ctr:2.14},
-  {n:"Audience Network",sp:18000,l:62,cpl:290.32,ctr:0.52},
-  {n:"Others",sp:10068,l:26,cpl:387.23,ctr:0.38}
+  {n:"Facebook Feed",sp:213000,l:1340,cpl:158.96,ctr:1.4},
+  {n:"Instagram Feed",sp:133500,l:747,cpl:178.71,ctr:1.65},
+  {n:"Instagram Stories",sp:78000,l:327,cpl:238.53,ctr:0.87},
+  {n:"Facebook Reels",sp:42000,l:213,cpl:197.18,ctr:2.1},
+  {n:"Audience Network",sp:27000,l:93,cpl:290.32,ctr:0.5},
+  {n:"Others",sp:15103,l:39,cpl:387.26,ctr:0.36}
 ];
 
-// Demographic breakdown (Meta Ads Manager - Mar 1-16)
+// Demographic breakdown (Meta Ads Manager - Mar 1-22)
 const ageGrp = [
-  {n:"25-34",l:612,cpl:148},{n:"35-44",l:548,cpl:156},{n:"45-54",l:378,cpl:172},
-  {n:"18-24",l:168,cpl:198},{n:"55-64",l:102,cpl:215},{n:"65+",l:30,cpl:285}
+  {n:"25-34",l:919,cpl:150},{n:"35-44",l:823,cpl:158},{n:"45-54",l:567,cpl:174},{n:"18-24",l:252,cpl:200},{n:"55-64",l:153,cpl:218},{n:"65+",l:46,cpl:288}
 ];
-const genderGrp = [{n:"Male",l:1098,cpl:158},{n:"Female",l:628,cpl:171},{n:"Unknown",l:112,cpl:189}];
+const genderGrp = [{n:"Male",l:1648,cpl:160},{n:"Female",l:943,cpl:173},{n:"Unknown",l:168,cpl:191}];
 const locGrp = [
-  {n:"Bangalore",l:286,cpl:142},{n:"Hyderabad",l:234,cpl:151},{n:"Chennai",l:198,cpl:148},
-  {n:"Mumbai",l:187,cpl:168},{n:"Delhi NCR",l:176,cpl:175},{n:"Pune",l:142,cpl:159},
-  {n:"Kolkata",l:118,cpl:182},{n:"Others",l:497,cpl:178}
+  {n:"Bangalore",l:430,cpl:144},{n:"Hyderabad",l:351,cpl:153},{n:"Chennai",l:297,cpl:150},{n:"Mumbai",l:280,cpl:170},{n:"Delhi NCR",l:264,cpl:177},{n:"Pune",l:213,cpl:161},{n:"Kolkata",l:177,cpl:184},{n:"Others",l:747,cpl:180}
 ];
 
 // Monthly targets
 const TGT = {budget:875000,awBudget:180000,perfBudget:695000,leads:4894,cpl:142,prx:1370,prxRate:0.28,validPrx:1096,validPrxRate:0.80,orders:220,convRate:0.045,validPrxConvRate:0.22,validPrxToLeads:0.20,cpa:3156,revenue:550616,roas:0.79,aov:2500};
 
-// Actuals (Mar 1-16, revenue from manual data Mar 1-15)
-const ACT = {revenue:191904,revenueExGst:182766,prx:434,validPrx:Math.round(434*0.80),orders:76,aov:2525,convRate:0.0419};
+// Actuals (Mar 1-26, revenue from manual data Mar 1-26)
+const ACT = {revenue:309875,revenueExGst:295119,prx:701,validPrx:561,orders:123,aov:2519,convRate:0.0424};
 
 // ===== UTILS =====
 const fmt=n=>n==null?'–':'₹'+Math.round(n).toLocaleString('en-IN');
@@ -580,7 +593,7 @@ const pctI=n=>n==null?'–':Math.round(n)+'%';
 function bg(cpl,avg){if(cpl==null)return'<span class="badge badge-yellow">N/A</span>';if(cpl<=avg*.85)return'<span class="badge badge-green">Efficient</span>';if(cpl<=avg*1.15)return'<span class="badge badge-yellow">Average</span>';return'<span class="badge badge-red">High Cost</span>'}
 function fnBadge(t){const m={'TOF':'badge-blue','MOF':'badge-purple','BOF':'badge-green'};return`<span class="badge ${m[t]||'badge-yellow'}">${t}</span>`}
 
-let fFrom='2026-03-01',fTo='2026-03-16';
+let fFrom='2026-03-01',fTo='2026-03-26';
 function gf(){return D.filter(d=>d.d>=fFrom&&d.d<=fTo)}
 function applyFilter(){fFrom=document.getElementById('dateFrom').value;fTo=document.getElementById('dateTo').value;renderAll()}
 
