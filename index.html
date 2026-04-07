@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PillUp Performance Dashboard | March 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f5f7fa;color:#1a1a2e;min-height:100vh}
+
+/* Top Header */
+.header{background:#fff;border-bottom:1px solid #e2e8f0;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.header-left{display:flex;align-items:center;gap:14px}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,#0d4f4f,#1a8a6e);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px;font-weight:700}
+.logo-text{font-size:22px;font-weight:700}.logo-text span:first-child{color:#0d2f4f}.logo-text span:last-child{color:#1a8a6e}
+.header-subtitle{font-size:12px;color:#94a3b8;margin-left:16px;padding-left:16px;border-left:1px solid #e2e8f0}
+.header-right{display:flex;align-items:center;gap:12px}
+.date-filter{display:flex;align-items:center;gap:8px}
+.date-filter label{font-size:12px;color:#64748b;font-weight:500}
+.date-filter input[type="date"]{padding:7px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;color:#1a1a2e}
+.date-filter input:focus{outline:none;border-color:#1a8a6e;box-shadow:0 0 0 2px rgba(26,138,110,0.1)}
+.btn-apply{padding:7px 18px;background:linear-gradient(135deg,#0d4f4f,#1a8a6e);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer}
+.btn-apply:hover{opacity:.9}
+.refresh-badge{font-size:11px;color:#94a3b8;text-align:right;line-height:1.3}
+
+/* Horizontal Tabs */
+.tab-bar{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 32px;display:flex;gap:0;overflow-x:auto;position:sticky;top:68px;z-index:15}
+.tab-btn{padding:14px 22px;font-size:13px;font-weight:600;color:#64748b;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.tab-btn:hover{color:#1a1a2e;background:#f8fafc}
+.tab-btn.active{color:#0d4f4f;border-bottom-color:#1a8a6e}
+.tab-btn .tab-icon{font-size:15px}
+
+/* Content */
+.content{padding:24px 32px;max-width:1400px;margin:0 auto}
+.tab-content{display:none}.tab-content.active{display:block}
+
+/* KPI Cards */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+.kpi-card{background:#fff;border-radius:12px;padding:18px;border:1px solid #e2e8f0}
+.kpi-card.hl{background:linear-gradient(135deg,#0d4f4f,#1a8a6e);color:#fff}
+.kpi-card.hl .kpi-label{color:rgba(255,255,255,.8)}.kpi-card.hl .kpi-sub{color:rgba(255,255,255,.65)}
+.kpi-label{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:#64748b;font-weight:600;margin-bottom:6px}
+.kpi-value{font-size:26px;font-weight:700;line-height:1.1}
+.kpi-sub{font-size:11px;color:#94a3b8;margin-top:3px}
+.kpi-change{font-size:11px;margin-top:4px;font-weight:600}
+.kpi-change.bad{color:#ef4444}.kpi-change.good{color:#22c55e}
+.kpi-card.hl .kpi-change.bad{color:#fca5a5}.kpi-card.hl .kpi-change.good{color:#86efac}
+
+/* Sections */
+.section{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:22px;margin-bottom:20px}
+.section-title{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title .dot{width:8px;height:8px;border-radius:50%;background:#1a8a6e}
+
+/* Charts */
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.chart-box{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:22px}
+.chart-box h3{font-size:13px;font-weight:600;margin-bottom:14px;color:#1a1a2e}
+.chart-container{position:relative;height:260px}
+.chart-full .chart-container{height:300px}
+
+/* Tables */
+.table-wrap{max-height:380px;overflow-y:auto;border-radius:8px}
+.table-wrap::-webkit-scrollbar{width:5px}.table-wrap::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+.dt{width:100%;border-collapse:separate;border-spacing:0;font-size:12px}
+.dt thead th{background:#f8fafc;padding:10px 14px;text-align:left;font-weight:600;color:#64748b;font-size:10px;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #e2e8f0;position:sticky;top:0}
+.dt tbody td{padding:10px 14px;border-bottom:1px solid #f1f5f9}
+.dt tbody tr:hover{background:#f8fafc}
+.dt .num{text-align:right;font-variant-numeric:tabular-nums}
+.badge{display:inline-block;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:600}
+.badge-green{background:#dcfce7;color:#166534}.badge-yellow{background:#fef3c7;color:#92400e}.badge-red{background:#fee2e2;color:#991b1b}.badge-blue{background:#dbeafe;color:#1e40af}.badge-purple{background:#f3e8ff;color:#6b21a8}
+
+/* Insight Action Cards */
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.action-card{padding:18px 20px;border-radius:10px;border-left:4px solid}
+.action-card h4{font-size:13px;font-weight:700;margin-bottom:5px;display:flex;align-items:center;gap:8px}
+.action-card p{font-size:12px;color:#475569;line-height:1.5}
+.action-card .action-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;margin-bottom:6px}
+.ac-increase{border-color:#22c55e;background:#f0fdf4}.ac-increase .action-tag{background:#dcfce7;color:#166534}
+.ac-decrease{border-color:#f59e0b;background:#fffbeb}.ac-decrease .action-tag{background:#fef3c7;color:#92400e}
+.ac-pause{border-color:#ef4444;background:#fef2f2}.ac-pause .action-tag{background:#fee2e2;color:#991b1b}
+.ac-monitor{border-color:#3b82f6;background:#eff6ff}.ac-monitor .action-tag{background:#dbeafe;color:#1e40af}
+.ac-test{border-color:#8b5cf6;background:#faf5ff}.ac-test .action-tag{background:#f3e8ff;color:#6b21a8}
+.ac-run{border-color:#14b8a6;background:#f0fdfa}.ac-run .action-tag{background:#ccfbf1;color:#115e59}
+
+/* Progress bars */
+.progress-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.progress-card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:20px}
+.progress-card h4{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#64748b;font-weight:600;margin-bottom:10px}
+.progress-bar-wrap{background:#f1f5f9;border-radius:8px;height:24px;overflow:hidden;margin-bottom:8px;position:relative}
+.progress-bar-fill{height:100%;border-radius:8px;transition:width .5s;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:10px;font-weight:700;color:#fff;min-width:30px}
+.progress-bar-fill.on-track{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.progress-bar-fill.behind{background:linear-gradient(135deg,#f59e0b,#d97706)}
+.progress-bar-fill.critical{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.progress-bar-fill.ahead{background:linear-gradient(135deg,#0d4f4f,#1a8a6e)}
+.progress-detail{display:flex;justify-content:space-between;font-size:11px;color:#64748b}
+
+/* Revenue section */
+.rev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.rev-card{background:#f8fafc;border-radius:10px;padding:14px;text-align:center}
+.rev-card .rv-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#64748b;font-weight:600}
+.rev-card .rv-value{font-size:22px;font-weight:700;margin-top:3px;color:#1a1a2e}
+.rev-card .rv-sub{font-size:11px;color:#94a3b8;margin-top:2px}
+
+/* Funnel visual */
+.funnel-visual{display:flex;align-items:center;justify-content:center;gap:0;margin:30px 0;padding:20px}
+.funnel-stage{text-align:center;position:relative}
+.funnel-box{border-radius:12px;padding:20px 24px;color:#fff;min-width:160px}
+.funnel-box h3{font-size:20px;font-weight:700}.funnel-box p{font-size:11px;opacity:.85;margin-top:2px}
+.funnel-arrow{font-size:28px;color:#94a3b8;padding:0 10px}
+.funnel-rate{font-size:11px;color:#64748b;margin-top:8px;font-weight:600}
+
+/* Insight chips */
+.insight-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:16px}
+.insight-chip{padding:14px 16px;border-radius:10px;border-left:4px solid;transition:transform .15s,box-shadow .15s}
+.insight-chip:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.insight-chip .chip-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:4px}
+.insight-chip .chip-value{font-size:20px;font-weight:700;line-height:1.2}
+.insight-chip .chip-sub{font-size:11px;color:#64748b;margin-top:2px}
+.chip-green{border-color:#22c55e;background:#f0fdf4}.chip-green .chip-label{color:#166534}
+.chip-red{border-color:#ef4444;background:#fef2f2}.chip-red .chip-label{color:#991b1b}
+.chip-blue{border-color:#3b82f6;background:#eff6ff}.chip-blue .chip-label{color:#1e40af}
+.chip-purple{border-color:#8b5cf6;background:#faf5ff}.chip-purple .chip-label{color:#6b21a8}
+.chip-amber{border-color:#f59e0b;background:#fffbeb}.chip-amber .chip-label{color:#92400e}
+.chip-teal{border-color:#14b8a6;background:#f0fdfa}.chip-teal .chip-label{color:#115e59}
+.action-card{transition:transform .15s,box-shadow .15s;cursor:default}
+.action-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.section-tag{display:inline-block;font-size:10px;padding:3px 10px;border-radius:12px;font-weight:600;margin-left:8px}
+.note-box{padding:14px 18px;border-radius:10px;font-size:12px;line-height:1.6;margin-top:14px}
+
+/* Creative Cards */
+.cre-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}
+.cre-card{border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;background:#fff;transition:transform .15s,box-shadow .15s}
+.cre-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+.cre-card.paused-card{opacity:.7;border:1px dashed #cbd5e1}
+.cre-card.paused-card:hover{opacity:1}
+.cre-header{position:relative;height:110px;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer}
+.cre-header img{width:100%;height:100%;object-fit:cover}
+.cre-rank{position:absolute;top:6px;left:6px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:10px;color:#1a1a2e;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.cre-type-badge{position:absolute;top:6px;right:6px;padding:2px 7px;border-radius:4px;font-size:8px;font-weight:700;letter-spacing:.3px}
+.cre-type-vid{background:rgba(139,92,246,.9);color:#fff}
+.cre-type-img{background:rgba(34,197,94,.9);color:#fff}
+.cre-type-car{background:rgba(59,130,246,.9);color:#fff}
+.cre-status-badge{position:absolute;bottom:6px;left:6px;padding:2px 6px;border-radius:4px;font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.cre-paused-badge{background:rgba(239,68,68,.85);color:#fff}
+.cre-active-badge{background:rgba(34,197,94,.85);color:#fff}
+.cre-ig-link{position:absolute;bottom:6px;right:6px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;font-size:11px;text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.cre-icon{font-size:32px;color:rgba(255,255,255,.35)}
+.cre-icon-sub{font-size:9px;color:rgba(255,255,255,.7);margin-top:4px;font-weight:500;text-align:center;max-width:90%;line-height:1.2}
+.cre-body{padding:10px 10px 8px}
+.cre-name{font-size:11px;font-weight:700;margin-bottom:6px;color:#1a1a2e;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cre-stats{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px}
+.cre-stat{background:#f8fafc;border-radius:5px;padding:5px 7px}
+.cre-stat .sl{font-size:7px;text-transform:uppercase;letter-spacing:.4px;color:#64748b;font-weight:600}
+.cre-stat .sv{font-size:12px;font-weight:700;color:#1a1a2e;margin-top:1px}
+.cre-copy-box{padding:6px 8px;background:#f0f9ff;border-radius:6px;margin-bottom:6px;font-size:9px;color:#0369a1;line-height:1.4;border-left:2px solid #3b82f6;font-style:italic;max-height:42px;overflow:hidden}
+.cre-copy-box strong{font-style:normal;color:#1e40af;font-size:8px}
+.cre-why-box{padding:6px 8px;border-radius:6px;margin-bottom:6px;font-size:9px;line-height:1.4;max-height:48px;overflow:hidden}
+.cre-why-box h5{font-size:9px;font-weight:700;margin-bottom:2px;display:flex;align-items:center;gap:4px}
+.cre-tags-compact{display:flex;flex-wrap:wrap;gap:3px}
+.cre-tags-compact .badge{font-size:7px;padding:2px 5px;border-radius:3px}
+.cre-why-good{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}
+.cre-why-bad{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+.cre-why-avg{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+.cre-tags{display:flex;flex-wrap:wrap;gap:6px;padding-top:4px}
+
+@media(max-width:1300px){.cre-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:1100px){.chart-row,.action-grid,.progress-row{grid-template-columns:1fr}.rev-grid{grid-template-columns:repeat(3,1fr)}.cre-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:768px){.cre-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo-icon">P</div>
+    <div class="logo-text"><span>Pill</span><span>up</span></div>
+    <div class="header-subtitle">Meta Ads Performance Dashboard &middot; March 2026</div>
+  </div>
+  <div class="header-right">
+    <div class="date-filter">
+      <label>From</label><input type="date" id="dateFrom" value="2026-03-01" min="2026-03-01" max="2026-03-26">
+      <label>To</label><input type="date" id="dateTo" value="2026-03-26" min="2026-03-01" max="2026-03-26">
+      <button class="btn-apply" onclick="applyFilter()">Apply</button>
+    </div>
+    <div class="refresh-badge" id="refreshBadge">Last sync: Mar 30, 12:00 AM<br><span style="color:#f59e0b;font-weight:600">Coupler data thru Mar 26</span></div>
+  </div>
+</div>
+
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <div class="tab-btn active" data-tab="overview"><span class="tab-icon">&#128202;</span> Overview</div>
+  <div class="tab-btn" data-tab="leads"><span class="tab-icon">&#127919;</span> Leads (LP)</div>
+  <div class="tab-btn" data-tab="creatives"><span class="tab-icon">&#127912;</span> Creative Analysis</div>
+  <div class="tab-btn" data-tab="funnel"><span class="tab-icon">&#128161;</span> Funnel (TOF/MOF/BOF)</div>
+  <div class="tab-btn" data-tab="insights"><span class="tab-icon">&#9889;</span> Insights & Actions</div>
+  <div class="tab-btn" data-tab="progress"><span class="tab-icon">&#128200;</span> Monthly Progress</div>
+  <div class="tab-btn" data-tab="awareness"><span class="tab-icon">&#128227;</span> Awareness</div>
+</div>
+
+<div class="content">
+
+<!-- ====== OVERVIEW TAB ====== -->
+<div class="tab-content active" id="tab-overview">
+  <div id="partialBanner" style="padding:10px 16px;background:#e0f2fe;border:1px solid #7dd3fc;border-radius:8px;font-size:12px;color:#0369a1;margin-bottom:14px;display:none"><strong>Note:</strong> Mar 26 data is partial (synced 3:31 AM). Full-day numbers will be higher.</div>
+  <div class="kpi-row" id="ovKpis"></div>
+  <div class="chart-row">
+    <div class="chart-box"><h3>Daily Spend by Type</h3><div class="chart-container"><canvas id="chOvSpend"></canvas></div></div>
+    <div class="chart-box"><h3>Daily Leads & CPL</h3><div class="chart-container"><canvas id="chOvLeadsCpl"></canvas></div></div>
+  </div>
+  <!-- Revenue ABOVE Campaign Performance -->
+  <div class="section">
+    <div class="section-title"><span class="dot"></span> Revenue & ROAS (LP Campaigns Only)</div>
+    <div class="rev-grid" id="revGrid"></div>
+    <div style="padding:10px 14px;background:#fef3c7;border-radius:8px;font-size:12px;color:#92400e;margin-top:12px"><strong>Note:</strong> Awareness, Engagement & Traffic spend excluded from ROAS. Revenue is LP-only.</div>
+  </div>
+  <div class="section">
+    <div class="section-title"><span class="dot"></span> Campaign Performance <span style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:8px">(Ordered: TOF → MOF → BOF)</span></div>
+    <div class="table-wrap"><table class="dt" id="tblCampaigns"><thead><tr><th>Campaign</th><th>Type</th><th class="num">Spend</th><th class="num">Leads</th><th class="num">CPL</th><th class="num">CTR</th><th class="num">CPC</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</div>
+
+<!-- ====== LEADS TAB ====== -->
+<div class="tab-content" id="tab-leads">
+  <div class="kpi-row" id="lpKpis"></div>
+  <div class="chart-row">
+    <div class="chart-box"><h3>Daily LP Leads</h3><div class="chart-container"><canvas id="chLpLeads"></canvas></div></div>
+    <div class="chart-box"><h3>Daily LP CPL Trend</h3><div class="chart-container"><canvas id="chLpCpl"></canvas></div></div>
+  </div>
+  <div class="section">
+    <div class="section-title"><span class="dot"></span> LP Campaign Breakdown</div>
+    <div class="table-wrap"><table class="dt" id="tblLp"><thead><tr><th>Campaign</th><th class="num">Spend</th><th class="num">Leads</th><th class="num">CPL</th><th class="num">CTR</th><th class="num">W.CTR</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-box"><h3>Audience CPL Comparison</h3><div class="chart-container"><canvas id="chAudCpl"></canvas></div></div>
+    <div class="chart-box"><h3>Creative CPL Comparison</h3><div class="chart-container"><canvas id="chCreCpl"></canvas></div></div>
+  </div>
+  <div class="section">
+    <div class="section-title"><span class="dot"></span> Audience Performance</div>
+    <div class="table-wrap"><table class="dt" id="tblAud"><thead><tr><th>Audience</th><th class="num">Spend</th><th class="num">Leads</th><th class="num">CPL</th><th class="num">CTR</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="section">
+    <div class="section-title"><span class="dot"></span> Creative Performance</div>
+    <div class="table-wrap"><table class="dt" id="tblCre"><thead><tr><th>Creative</th><th>Type</th><th class="num">Spend</th><th class="num">Leads</th><th class="num">CPL</th><th class="num">CTR</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-box"><h3>Image vs Video: Leads Split</h3><div class="chart-container"><canvas id="chImgVidLeads"></canvas></div></div>
+    <div class="chart-box"><h3>Image vs Video: CPL Comparison</h3><div class="chart-container"><canvas id="chImgVidCpl"></canvas></div></div>
+  </div>
+  <div class="section">
+    <div class="section-title"><span class="dot" style="background:#3b82f6"></span> LP Key Observations</div>
+    <div class="action-grid" id="lpObservations"></div>
+  </div>
+</div>
+
+<!-- ====== CREATIVES TAB ====== -->
+<div class="tab-content" id="tab-creatives">
+  <div class="kpi-row" id="crKpis"></div>
+
+  <!-- Creative Performance Cards -->
+  <div style="padding:10px 16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12px;color:#1e40af;margin-bottom:18px"><strong>💡 Tip:</strong> Click card headers with 🔗 to view creatives on Instagram. Upload creative images for visual thumbnails.</div>
+  <div id="creCardGrid"></div>
+
+  <!-- Top Performing + Charts -->
+  <div class="section">
+    <div class="section-title"><span class="dot" style="background:#22c55e"></span> Top Performing Creatives <span class="section-tag" style="background:#dcfce7;color:#166534">Winners</span></div>
+    <div class="insight-strip" id="topCreStrip"></div>
+    <div class="chart-row">
+      <div class="chart-box" style="border:none;padding:10px 0"><h3>CPL by Creative (vs Benchmark)</h3><div class="chart-container" style="height:320px"><canvas id="chCreCplBar"></canvas></div></div>
+      <div class="chart-box" style="border:none;padding:10px 0"><h3>Engagement Rate by Creative</h3><div class="chart-container" style="height:320px"><canvas id="chCreEngRate"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- Creative Fatigue Analysis -->
+  <div class="section">
+    <div class="section-title"><span class="dot" style="background:#f59e0b"></span> Creative Fatigue Analysis <span class="section-tag" style="background:#fef3c7;color:#92400e">Frequency Monitor</span></div>
+    <div class="chart-row">
+      <div class="chart-box" style="border:none;padding:10px 0"><h3>Frequency by Creative (Fatigue Zones)</h3><div class="chart-container"><canvas id="chCreFatigue"></canvas></div></div>
+      <div class="chart-box" style="border:none;padding:10px 0"><h3>Hook Retention Rate (Videos Only)</h3><div class="chart-container"><canvas id="chCreHook"></canvas></div></div>
+    </div>
+    <div class="action-grid" id="fatigueInsights"></div>
+  </div>
+
+  <!-- Hook Performance -->
+  <div class="section">
+    <div class="section-title"><span class="dot" style="background:#14b8a6"></span> Hook Performance <span class="section-tag" style="background:#ccfbf1;color:#115e59">Video Engagement</span></div>
+    <div class="insight-strip" id="hookStrip"></div>
+    <div class="action-grid" id="hookInsights"></div>
+  </div>
+
+  <!-- Placement-Based Creative Performance -->
+  <div class="section">
+    <div class="section-title"><span class="dot" style="background:#3b82f6"></span> Placement-Based Creative Performance <span class="section-tag" style="background:#dbeafe;color:#1e40af">Channel Fit</span></div>
+    <div class="action-grid" id="placementCreInsights"></div>
+  </div>
+
+  <!-- Creative Testing Insights -->
+  <div class="section">
+    <div class="section-title"><span class="dot" style="background:#8b5cf6"></span> Creative Testing Insights <span class="section-tag" style="background:#f3e8ff;color:#6b21a8">Learnings</span></div>
+    <div class="action-grid" id="testingInsights"></div>
+  </div>
+
+  <!-- Actions Needed -->
+  <div class="section">
+    <div class="section-title"><span class="dot" style="background:#ef4444"></span> Actions Needed <span class="section-tag" style="background:#fee2e2;color:#991b1b">Optimization</span></div>
+    <div class="action-grid" id="creActionGrid"></div>
+  </div>
+
+  <!-- New Creative Recommendations -->
+  <div class="section">
+    <div class="section-title"><span class="dot" style="background:#1a8a6e"></span> New Creative Recommendations <span class="section-tag" style="background:#dcfce7;color:#166534">Next Steps</span></div>
+    <div class="action-grid" id="newCreRecs"></div>
+  </div>
+</div>
+
+<!-- ====== FUNNEL TAB ====== -->
+<div class="tab-content" id="tab-funnel">
+  <div class="kpi-row" id="fnKpis"></div>
+  <div class="funnel-visual" id="funnelVisual"></div>
+  <div class="chart-row">
+    <div class="chart-box"><h3>Spend Split: TOF vs MOF vs BOF</h3><div class="chart-container"><canvas id="chFnPie"></canvas></div></div>
+    <div class="chart-box"><h3>Daily Spend by Funnel Stage</h3><div class="chart-container"><canvas id="chFnDaily"></canvas></div></div>
+  </div>
+  <div class="section">
+    <div class="section-title"><span class="dot"></span> Funnel Stage Breakdown</div>
+    <div class="table-wrap"><table class="dt" id="tblFunnel"><thead><tr><th>Campaign</th><th>Funnel</th><th class="num">Spend</th><th class="num">Leads</th><th class="num">CPL</th><th class="num">CTR</th><th class="num">CPC</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</div>
+
+<!-- ====== INSIGHTS TAB ====== -->
+<div class="tab-content" id="tab-insights">
+  <div class="kpi-row" id="insKpis"></div>
+
+  <!-- Lead Volume Trend -->
+  <div class="section">
+    <div class="section-title"><span class="dot" style="background:#1a8a6e"></span> Lead Volume Trend <span class="section-tag" style="background:#dcfce7;color:#166534">Volume Analysis</span></div>
+    <div class="insight-strip" id="leadVolStrip"></div>
+    <div style="position:relative;height:220px;margin-top:8px"><canvas id="chInsLeadVol"></canvas></div>
+  </div>
+
+  <!-- Lead Cost Efficiency -->
+  <div class="section">
+    <div class="section-title"><span class="dot" style="background:#ef4444"></span> Lead Cost Efficiency <span class="section-tag" style="background:#fee2e2;color:#991b1b">CPL Analysis</span></div>
+    <div class="insight-strip" id="cplStrip"></div>
+    <div style="position:relative;height:240px;margin-bottom:14px"><canvas id="chInsCpl"></canvas></div>
+    <div class="action-grid" id="cplInsights"></div>
+    <div class="note-box" style="background:#fef3c7;border:1px solid #fde68a;color:#92400e" id="cplActionNote"></div>
+  </div>
+
+  <!-- Placement Performance -->
+  <div class="section">
+    <div class="section-title"><span class="dot" style="background:#3b82f6"></span> Placement Performance <span class="section-tag" style="background:#dbeafe;color:#1e40af">Channel Breakdown</span></div>
+    <div class="chart-row" style="margin-bottom:14px">
+      <div class="chart-box" style="border:none;padding:10px 0"><h3>Leads by Placement</h3><div class="chart-container"><canvas id="chPlaceLeads"></canvas></div></div>
+      <div class="chart-box" style="border:none;padding:10px 0"><h3>CPL by Placement</h3><div class="chart-container"><canvas id="chPlaceCpl"></canvas></div></div>
+    </div>
+    <div class="insight-strip" id="placementStrip"></div>
+  </div>
+
+  <!-- Audience Performance -->
+  <div class="section">
+    <div class="section-title"><span class="dot" style="background:#8b5cf6"></span> Audience Performance <span class="section-tag" style="background:#f3e8ff;color:#6b21a8">Demographics</span></div>
+    <div class="chart-row" style="margin-bottom:14px">
+      <div class="chart-box" style="border:none;padding:10px 0"><h3>Leads by Age Group</h3><div class="chart-container"><canvas id="chAgeLeads"></canvas></div></div>
+      <div class="chart-box" style="border:none;padding:10px 0"><h3>Leads by Gender</h3><div class="chart-container"><canvas id="chGenderLeads"></canvas></div></div>
+    </div>
+    <div class="chart-row" style="margin-bottom:14px">
+      <div class="chart-box" style="border:none;padding:10px 0"><h3>Leads by Location (Top Cities)</h3><div class="chart-container"><canvas id="chLocLeads"></canvas></div></div>
+      <div class="chart-box" style="border:none;padding:10px 0"><h3>CPL by Age Segment</h3><div class="chart-container"><canvas id="chAudSegCpl"></canvas></div></div>
+    </div>
+    <div class="action-grid" id="audienceInsights"></div>
+  </div>
+
+  <!-- Optimization Opportunities -->
+  <div class="section">
+    <div class="section-title"><span class="dot" style="background:#f59e0b"></span> Optimization Opportunities <span class="section-tag" style="background:#fef3c7;color:#92400e">Action Plan</span></div>
+    <div class="action-grid" id="optimizationGrid"></div>
+  </div>
+</div>
+
+<!-- ====== MONTHLY PROGRESS TAB ====== -->
+<div class="tab-content" id="tab-progress">
+  <div class="kpi-row" id="prKpis"></div>
+  <div class="progress-row" id="progressBars"></div>
+  <div class="chart-row">
+    <div class="chart-box"><h3>Cumulative Leads vs Target Pace</h3><div class="chart-container"><canvas id="chPrLeads"></canvas></div></div>
+    <div class="chart-box"><h3>Cumulative Spend vs Budget Pace</h3><div class="chart-container"><canvas id="chPrSpend"></canvas></div></div>
+  </div>
+  <div class="section">
+    <div class="section-title"><span class="dot"></span> March Projections vs Targets</div>
+    <div class="table-wrap"><table class="dt" id="tblProjections"><thead><tr><th>Metric</th><th class="num">Target</th><th class="num">Achieved (26 days)</th><th class="num">Projected (31 days)</th><th class="num">% of Target</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</div>
+
+<!-- ====== AWARENESS TAB ====== -->
+<div class="tab-content" id="tab-awareness">
+  <div class="kpi-row" id="awKpis"></div>
+  <div class="chart-row">
+    <div class="chart-box"><h3>Daily Awareness + Traffic + Engagement Spend</h3><div class="chart-container"><canvas id="chAwSpend"></canvas></div></div>
+    <div class="chart-box"><h3>Estimated Daily Impressions</h3><div class="chart-container"><canvas id="chAwImpr"></canvas></div></div>
+  </div>
+  <div class="section">
+    <div class="section-title"><span class="dot"></span> Awareness Campaign Breakdown</div>
+    <div class="table-wrap"><table class="dt" id="tblAw"><thead><tr><th>Campaign</th><th>Type</th><th class="num">Spend</th><th class="num">CTR</th><th class="num">CPC</th><th class="num">CPM</th><th class="num">Est. Impressions</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ===== DATA =====
+const D = [
+  {d:"2026-03-01",ts:28691.55,lp:22169.48,aw:1268.52,en:2583.88,tr:2669.67,tl:126,ll:126,ctr:1.4,wctr:1.13,cpc:5.89,cpl:175.95},
+  {d:"2026-03-02",ts:26526.38,lp:20293.89,aw:1190.15,en:2381.28,tr:2661.06,tl:124,ll:124,ctr:1.49,wctr:1.24,cpc:6.22,cpl:163.66},
+  {d:"2026-03-03",ts:28058.89,lp:21763.39,aw:1207.05,en:2380.01,tr:2708.44,tl:126,ll:126,ctr:1.43,wctr:1.18,cpc:6.33,cpl:172.73},
+  {d:"2026-03-04",ts:26556.70,lp:20791.14,aw:1180.90,en:2198.65,tr:2386.01,tl:116,ll:116,ctr:1.36,wctr:1.11,cpc:6.21,cpl:179.23},
+  {d:"2026-03-05",ts:23640.28,lp:17893.38,aw:1204.25,en:2316.91,tr:2225.74,tl:109,ll:109,ctr:1.32,wctr:1.07,cpc:7.18,cpl:164.16},
+  {d:"2026-03-06",ts:23667.86,lp:17439.00,aw:1167.28,en:2477.40,tr:2584.18,tl:115,ll:115,ctr:1.38,wctr:1.09,cpc:7.12,cpl:151.64},
+  {d:"2026-03-07",ts:23351.16,lp:16842.79,aw:1181.85,en:2396.81,tr:2929.71,tl:114,ll:113,ctr:1.55,wctr:1.23,cpc:6.2,cpl:149.05},
+  {d:"2026-03-08",ts:24913.32,lp:18736.80,aw:1253.70,en:2264.61,tr:2658.21,tl:144,ll:144,ctr:1.43,wctr:1.13,cpc:7.18,cpl:130.12},
+  {d:"2026-03-09",ts:25398.56,lp:18920.39,aw:1197.63,en:2636.48,tr:2644.06,tl:117,ll:117,ctr:1.42,wctr:1.12,cpc:6.85,cpl:161.71},
+  {d:"2026-03-10",ts:27303.76,lp:20955.77,aw:1199.48,en:2414.67,tr:2733.84,tl:113,ll:113,ctr:1.36,wctr:1.06,cpc:7.19,cpl:185.45},
+  {d:"2026-03-11",ts:27764.00,lp:21659.13,aw:1195.16,en:2352.79,tr:2556.92,tl:137,ll:137,ctr:1.18,wctr:0.9,cpc:8.62,cpl:158.1},
+  {d:"2026-03-12",ts:27993.42,lp:21789.11,aw:1187.16,en:2341.43,tr:2675.72,tl:136,ll:136,ctr:1.11,wctr:0.84,cpc:8.55,cpl:160.21},
+  {d:"2026-03-13",ts:26831.65,lp:20777.07,aw:1196.47,en:2342.45,tr:2515.66,tl:114,ll:113,ctr:1.11,wctr:0.83,cpc:8.89,cpl:183.87},
+  {d:"2026-03-14",ts:26110.07,lp:20001.13,aw:1170.40,en:2415.79,tr:2522.75,tl:107,ll:107,ctr:1.13,wctr:0.86,cpc:8.73,cpl:186.93},
+  {d:"2026-03-15",ts:28211.63,lp:21524.57,aw:1266.84,en:2578.48,tr:2841.74,tl:117,ll:117,ctr:1.14,wctr:0.85,cpc:8.91,cpl:183.97},
+  {d:"2026-03-16",ts:25445.85,lp:19363.73,aw:1191.35,en:2357.91,tr:2532.86,tl:123,ll:123,ctr:1.21,wctr:0.9,cpc:8.32,cpl:157.43},
+  {d:"2026-03-17",ts:26461.62,lp:20689.92,aw:1188.75,en:2342.99,tr:2239.96,tl:127,ll:127,ctr:1.15,wctr:0.86,cpc:8.03,cpl:162.91},
+  {d:"2026-03-18",ts:25257.07,lp:19365.20,aw:1193.59,en:2403.85,tr:2294.43,tl:104,ll:104,ctr:1.05,wctr:0.77,cpc:8.1,cpl:186.2},
+  {d:"2026-03-19",ts:26218.86,lp:19626.08,aw:1202.58,en:2353.94,tr:3036.26,tl:101,ll:101,ctr:1.0,wctr:0.74,cpc:9.14,cpl:194.32},
+  {d:"2026-03-20",ts:26077.64,lp:20248.01,aw:1188.82,en:2364.10,tr:2276.71,tl:92,ll:92,ctr:0.9,wctr:0.66,cpc:8.69,cpl:220.09},
+  {d:"2026-03-21",ts:26064.85,lp:19811.57,aw:1166.98,en:2336.16,tr:2750.14,tl:81,ll:81,ctr:0.96,wctr:0.7,cpc:8.98,cpl:244.59},
+  {d:"2026-03-22",ts:29495.32,lp:22636.76,aw:1261.70,en:2612.69,tr:2984.17,tl:122,ll:122,ctr:1.05,wctr:0.78,cpc:9.05,cpl:185.55},
+  {d:"2026-03-23",ts:26943.83,lp:20529.45,aw:1185.42,en:2417.56,tr:2811.40,tl:105,ll:105,ctr:1.12,wctr:0.8,cpc:8.1,cpl:195.52},
+  {d:"2026-03-24",ts:28738.08,lp:22532.47,aw:1191.43,en:2468.13,tr:2546.05,tl:108,ll:108,ctr:1.23,wctr:0.86,cpc:7.68,cpl:208.63},
+  {d:"2026-03-25",ts:25788.42,lp:19707.65,aw:1189.22,en:2324.83,tr:2566.72,tl:101,ll:101,ctr:1.48,wctr:1.27,cpc:6.69,cpl:195.12},
+  {d:"2026-03-26",ts:8963.97,lp:7179.05,aw:348.59,en:706.24,tr:730.09,tl:22,ll:22,ctr:1.35,wctr:1.13,cpc:7.03,cpl:326.32,partial:true}
+];
+
+// Ordered: TOF → MOF → BOF
+const camps = [
+  {n:"Awareness Campaign | 2 May",t:"TOF",sp:30375.27,l:0,cpl:null,ctr:0.09,wctr:0.06,cpc:3.47},
+  {n:"Awareness Engagement | 2 May",t:"TOF",sp:60770.04,l:0,cpl:null,ctr:1.3,wctr:1.11,cpc:3.74},
+  {n:"Awareness Traffic | 5 May",t:"TOF",sp:66082.50,l:2,cpl:33041.25,ctr:3.69,wctr:3.17,cpc:0.6},
+  {n:"LP Customer List | 11 Nov",t:"MOF",sp:52131.20,l:261,cpl:199.74,ctr:1.77,wctr:1.87,cpc:12.26},
+  {n:"LP Goodflip Data List",t:"MOF",sp:29326.11,l:126,cpl:232.75,ctr:0.96,wctr:0.79,cpc:13.26},
+  {n:"LP LAL Audience | 13 Aug",t:"MOF",sp:63964.77,l:283,cpl:226.09,ctr:1.21,wctr:1.02,cpc:10.0},
+  {n:"LP MOF Campaign | 6 May",t:"MOF",sp:66744.36,l:339,cpl:196.89,ctr:0.76,wctr:0.72,cpc:10.11},
+  {n:"LP Campaign 2 (Tech-Savvy)",t:"BOF",sp:101876.70,l:493,cpl:206.65,ctr:0.78,wctr:0.62,cpc:9.86},
+  {n:"LP Campaign | 1 Dec",t:"BOF",sp:68652.90,l:533,cpl:128.80,ctr:1.45,wctr:0.96,cpc:5.95},
+  {n:"LP Different Audience Sales",t:"BOF",sp:77656.43,l:583,cpl:133.20,ctr:0.88,wctr:0.85,cpc:9.84},
+  {n:"NLP Advantage+ | 8 May",t:"BOF",sp:52894.46,l:281,cpl:188.24,ctr:0.84,wctr:0.74,cpc:7.82}
+];
+
+const auds = [
+  {n:"Away from home | 25 June",sp:74366.06,l:571,cpl:130.24,ctr:0.91},
+  {n:"Open Audience | South India",sp:68652.90,l:533,cpl:128.80,ctr:1.45},
+  {n:"Engaged Meta Audience",sp:53017.64,l:284,cpl:186.68,ctr:0.48},
+  {n:"NLP Advantage+",sp:52894.46,l:281,cpl:188.24,ctr:0.84},
+  {n:"Order Customer List",sp:52131.20,l:261,cpl:199.74,ctr:1.77},
+  {n:"Tech-Savvy Individuals",sp:101876.70,l:493,cpl:206.65,ctr:0.78},
+  {n:"LAL Customer List",sp:63964.77,l:283,cpl:226.09,ctr:1.21},
+  {n:"Customer List | Open Aud",sp:29326.11,l:126,cpl:232.75,ctr:0.96},
+  {n:"Website Audience",sp:13726.72,l:55,cpl:249.58,ctr:1.06},
+  {n:"Delivery App",sp:3290.37,l:12,cpl:274.20,ctr:0.68}
+];
+
+// ty: 'img'/'vid'/'car', freq=frequency, engRate=engagement%, hookRate=3sec hook retention% (video), fatigue/status/action=performance labels, bench=benchmark CPL, copy=ad copy, why=analysis
+const cres = [
+  {n:"All his meds video",sp:177237,l:1030,cpl:172.07,ctr:1.39,ty:'vid',freq:4.2,engRate:4.8,hookRate:42,fatigue:'high',status:'top',action:'optimize',bench:165,ig:'DM7gTR9vGfm',live:true,
+   copy:"Managing multiple medications for your parents? PillUp organizes all daily meds into one easy pouch — delivered to your door.",
+   why:"Pain-point messaging resonates deeply with 25-44 caregivers. Emotional hook + clear solution drives highest lead volume. Frequency 4.2 is a concern — needs fresh variants."},
+  {n:"Life without pillup video",sp:128436,l:635,cpl:202.26,ctr:0.67,ty:'vid',freq:3.1,engRate:2.1,hookRate:28,fatigue:'medium',status:'good',action:'optimize',bench:165,ig:'',live:true,
+   copy:"What does life look like without PillUp? Chaos, confusion, missed doses. There's a better way.",
+   why:"Negative framing creates urgency. Low CTR (0.67%) suggests weak hook — but those who click convert well."},
+  {n:"Parents Meds Video",sp:46952,l:233,cpl:201.51,ctr:1.02,ty:'vid',freq:2.5,engRate:3.6,hookRate:38,fatigue:'low',status:'avg',action:'optimize',bench:165,ig:'',live:true,
+   copy:"Your parents deserve better medication management. PillUp sorts, packs & delivers daily pouches.",
+   why:"Targets 'caring for parents' emotion — strong with 30-44 demographic. Moderate CPL, steady volume. Room to scale."},
+  {n:"Samajhdari_static",sp:34821,l:319,cpl:109.16,ctr:0.60,ty:'img',freq:2.2,engRate:2.8,hookRate:null,fatigue:'low',status:'top',action:'scale',bench:135,ig:'DRRqS5tgEhR',live:true,
+   copy:"Samajhdari isse kehte hain — sab dawai ek pouch mein, roz ghar pe.",
+   why:"Hindi emotional appeal with cultural relevance. Best CPL ₹109 — 19% below benchmark. Scale immediately."},
+  {n:"Struggling with meds Static",sp:32582,l:243,cpl:134.08,ctr:1.08,ty:'img',freq:2.0,engRate:2.5,hookRate:null,fatigue:'low',status:'top',action:'scale',bench:135,ig:'DKyh5miA6GF',live:true,
+   copy:"Struggling to manage multiple medications every day? There's a simpler way — PillUp daily medicine pouches.",
+   why:"Direct problem statement creates relatability. Below benchmark CPL. Low frequency = headroom to scale."},
+  {n:"Everyday meds video",sp:49128,l:247,cpl:198.9,ctr:0.57,ty:'vid',freq:2.1,engRate:2.3,hookRate:26,fatigue:'low',status:'avg',action:'test',bench:165,ig:'DVvo9npAJZy',live:true,
+   copy:"Everyday medication management made simple. Right meds, right time, every day.",
+   why:"Lowest hook rate (26%) — 74% scroll past. Generic framing. Needs complete creative refresh."},
+  {n:"Daily Meds pouch video",sp:16539,l:67,cpl:246.86,ctr:1.46,ty:'vid',freq:1.7,engRate:5.2,hookRate:45,fatigue:'low',status:'poor',action:'optimize',bench:165,ig:'',live:true,
+   copy:"See how PillUp organizes your daily medications into convenient, pre-sorted pouches.",
+   why:"High engagement (5.2%) and hook rate (45%) — users interested. High CPL = landing page mismatch issue."},
+  {n:"All meds in one video",sp:9738,l:54,cpl:180.34,ctr:0.77,ty:'vid',freq:1.5,engRate:2.9,hookRate:31,fatigue:'low',status:'avg',action:'test',bench:165,ig:'',live:true,
+   copy:"All your medications, sorted and delivered in one pouch. That's PillUp.",
+   why:"Feature-focused < problem-focused. CPL above benchmark. Needs stronger opening hook."},
+  {n:"Testimonial video",sp:6065,l:22,cpl:275.68,ctr:1.29,ty:'vid',freq:1.5,engRate:6.1,hookRate:52,fatigue:'low',status:'poor',action:'optimize',bench:165,ig:'DRhJNV8gMKP',live:true,
+   copy:"Real PillUp customer shares how managing family medications became stress-free.",
+   why:"Highest hook rate (52%) & engagement (6.1%). High CPL = post-hook content isn't converting. Fix CTA."},
+  {n:"Switch to Pillup Static",sp:4525,l:19,cpl:238.16,ctr:1.70,ty:'img',freq:1.2,engRate:3.4,hookRate:null,fatigue:'low',status:'poor',action:'pause',bench:135,ig:'DPN4KXpAMC9',live:true,
+   copy:"Switch to PillUp — Medication management, simplified.",
+   why:"High CTR (1.70%) but direct sell doesn't convert. Above benchmark. Rework with problem-first messaging."},
+  {n:"How pillup works video",sp:4284,l:12,cpl:357.01,ctr:0.58,ty:'vid',freq:0.9,engRate:2.0,hookRate:30,fatigue:'low',status:'poor',action:'test',bench:165,ig:'',live:true,
+   copy:"See how PillUp works — from ordering to daily medication delivery.",
+   why:"New creative, limited data. High CPL but low spend. Monitor for 1 more week."},
+  {n:"10 sec meds Video",sp:2410,l:3,cpl:803.33,ctr:1.10,ty:'vid',freq:0.8,engRate:4.5,hookRate:55,fatigue:'low',status:'critical',action:'pause',bench:165,ig:'',live:true,
+   copy:"Quick look: How PillUp organizes all your meds into one daily pouch.",
+   why:"Highest hook rate (55%) but worst CPL. Too short to build trust for health decisions. Pause."},
+  {n:"New pack video",sp:2073,l:5,cpl:414.53,ctr:0.88,ty:'vid',freq:0.5,engRate:3.0,hookRate:35,fatigue:'low',status:'poor',action:'test',bench:165,ig:'',live:true,
+   copy:"New PillUp packaging — same great medication management, better experience.",
+   why:"New creative, limited data. High CPL on small sample. Needs more spend to evaluate fairly."},
+  {n:"Let Pillup Care Carousel",sp:1647,l:6,cpl:274.5,ctr:2.15,ty:'car',freq:0.6,engRate:8.2,hookRate:null,fatigue:'low',status:'poor',action:'test',bench:150,ig:'DSZy2yYgIIQ',live:true,
+   copy:"Let PillUp take care of your medication management. Swipe to see how.",
+   why:"Highest engagement (8.2%). High CPL = CTA on last card isn't converting. Fix CTA placement."},
+  {n:"Pillup makes simple static",sp:781,l:2,cpl:390.5,ctr:0.56,ty:'img',freq:0.5,engRate:1.2,hookRate:null,fatigue:'low',status:'critical',action:'pause',bench:135,ig:'',live:true,
+   copy:"PillUp makes medication management simple. Try it today.",
+   why:"Generic messaging. Lowest engagement (1.2%). Only 2 leads at high CPL. Replace."},
+  // === PAUSED CREATIVES ===
+  {n:"Smart pouch video",sp:3200,l:14,cpl:228.57,ctr:0.92,ty:'vid',freq:1.0,engRate:3.1,hookRate:35,fatigue:'low',status:'avg',action:'review',bench:165,ig:'DSpNzLpAD17',live:false,
+   copy:"Watch how PillUp's smart pouch system organizes daily medications automatically.",
+   why:"Product-focused demo. Decent hook rate (35%) but weak CTA led to high CPL. Paused for optimization."},
+  {n:"Puneet Video",sp:4800,l:18,cpl:266.67,ctr:1.15,ty:'vid',freq:1.3,engRate:3.8,hookRate:40,fatigue:'low',status:'poor',action:'review',bench:165,ig:'DPVv7x4ANAT',live:false,
+   copy:"Puneet shares his experience managing his father's medications with PillUp.",
+   why:"Testimonial from real user. Good hook rate (40%) but conversion drops mid-funnel. Paused — rework CTA."},
+  {n:"Old vs new video",sp:2100,l:8,cpl:262.50,ctr:0.88,ty:'vid',freq:0.9,engRate:2.4,hookRate:29,fatigue:'low',status:'poor',action:'review',bench:165,ig:'DPVwDhmAFyU',live:false,
+   copy:"Old way vs PillUp way — see the difference in how medications are managed.",
+   why:"Comparison format has potential but weak execution. Hook rate 29% = first 3s not compelling enough. Paused."},
+  {n:"Diabetes Static DLP",sp:5600,l:32,cpl:175.00,ctr:1.22,ty:'img',freq:1.4,engRate:2.6,hookRate:null,fatigue:'low',status:'good',action:'review',bench:135,ig:'DPVwEVtACIW',live:false,
+   copy:"Managing diabetes medications daily? PillUp sorts all your meds into one easy pouch.",
+   why:"Condition-specific targeting works well. ₹175 CPL decent for niche. Paused to test on broader diabetes audience."},
+  {n:"Diabetes Static",sp:3400,l:16,cpl:212.50,ctr:0.95,ty:'img',freq:1.1,engRate:2.0,hookRate:null,fatigue:'low',status:'avg',action:'review',bench:135,ig:'DPVwDmYgKpo',live:false,
+   copy:"Diabetes medication management made simple with PillUp daily pouches.",
+   why:"Generic diabetes messaging. 57% above static benchmark. Needs stronger condition-specific hook. Paused."},
+  {n:"Dr Suraksha video",sp:6200,l:24,cpl:258.33,ctr:1.35,ty:'vid',freq:1.5,engRate:4.2,hookRate:44,fatigue:'low',status:'avg',action:'review',bench:165,ig:'DPVwBZrAEGs',live:false,
+   copy:"Dr. Suraksha explains why organized medication management matters for chronic patients.",
+   why:"Doctor authority angle = strong hook (44%). But ₹258 CPL means the authority isn't converting to action. Paused — rework with stronger CTA after doctor endorsement."},
+  {n:"Care_Static",sp:1800,l:7,cpl:257.14,ctr:0.72,ty:'img',freq:0.7,engRate:1.5,hookRate:null,fatigue:'low',status:'poor',action:'review',bench:135,ig:'DNpsSN5g2TY',live:false,
+   copy:"Care for your family's health — PillUp delivers sorted daily medication pouches.",
+   why:"Emotional 'care' angle but weak visual execution. Low CTR (0.72%) and engagement. 90% above benchmark. Paused."},
+  {n:"Tired of sorting_static",sp:2900,l:12,cpl:241.67,ctr:1.05,ty:'img',freq:0.9,engRate:2.2,hookRate:null,fatigue:'low',status:'avg',action:'review',bench:135,ig:'DOx89Y6gLLa',live:false,
+   copy:"Tired of sorting medications every day? Let PillUp do it for you.",
+   why:"Problem-aware hook is good direction but ₹242 CPL too high. Visual may need refresh. Paused for A/B test."},
+  {n:"Multiple prescription_static",sp:3100,l:15,cpl:206.67,ctr:1.18,ty:'img',freq:1.0,engRate:2.4,hookRate:null,fatigue:'low',status:'avg',action:'review',bench:135,ig:'DMZl_TbADB2',live:false,
+   copy:"Multiple prescriptions? One pouch. PillUp organizes all your daily medications.",
+   why:"Clear value prop targeting multi-med users. ₹207 CPL is above benchmark but audience is high-intent. Paused — test with lookalike audience."}
+];
+
+// Derived stats for LP tab
+const LP_CAMPS_LIVE = 8;
+const activeCres = cres.filter(c=>c.live);
+const pausedCres = cres.filter(c=>!c.live);
+const TOTAL_CREATIVES_LIVE = activeCres.length;
+const VIDEO_CREATIVES = activeCres.filter(c=>c.ty==='vid');
+const IMAGE_CREATIVES = activeCres.filter(c=>c.ty==='img'||c.ty==='car');
+const VIDEO_CREATIVES_COUNT = VIDEO_CREATIVES.length;
+const IMAGE_CREATIVES_COUNT = IMAGE_CREATIVES.length;
+const VIDEO_LEADS = VIDEO_CREATIVES.reduce((s,c)=>s+c.l,0);
+const IMAGE_LEADS = IMAGE_CREATIVES.reduce((s,c)=>s+c.l,0);
+const VIDEO_SPEND = VIDEO_CREATIVES.reduce((s,c)=>s+c.sp,0);
+const IMAGE_SPEND = IMAGE_CREATIVES.reduce((s,c)=>s+c.sp,0);
+const VIDEO_CPL = VIDEO_LEADS>0?VIDEO_SPEND/VIDEO_LEADS:null;
+const IMAGE_CPL = IMAGE_LEADS>0?IMAGE_SPEND/IMAGE_LEADS:null;
+
+// Placement breakdown (Meta Ads Manager - Mar 1-22)
+const places = [
+  {n:"Facebook Feed",sp:213000,l:1340,cpl:158.96,ctr:1.4},
+  {n:"Instagram Feed",sp:133500,l:747,cpl:178.71,ctr:1.65},
+  {n:"Instagram Stories",sp:78000,l:327,cpl:238.53,ctr:0.87},
+  {n:"Facebook Reels",sp:42000,l:213,cpl:197.18,ctr:2.1},
+  {n:"Audience Network",sp:27000,l:93,cpl:290.32,ctr:0.5},
+  {n:"Others",sp:15103,l:39,cpl:387.26,ctr:0.36}
+];
+
+// Demographic breakdown (Meta Ads Manager - Mar 1-22)
+const ageGrp = [
+  {n:"25-34",l:919,cpl:150},{n:"35-44",l:823,cpl:158},{n:"45-54",l:567,cpl:174},{n:"18-24",l:252,cpl:200},{n:"55-64",l:153,cpl:218},{n:"65+",l:46,cpl:288}
+];
+const genderGrp = [{n:"Male",l:1648,cpl:160},{n:"Female",l:943,cpl:173},{n:"Unknown",l:168,cpl:191}];
+const locGrp = [
+  {n:"Bangalore",l:430,cpl:144},{n:"Hyderabad",l:351,cpl:153},{n:"Chennai",l:297,cpl:150},{n:"Mumbai",l:280,cpl:170},{n:"Delhi NCR",l:264,cpl:177},{n:"Pune",l:213,cpl:161},{n:"Kolkata",l:177,cpl:184},{n:"Others",l:747,cpl:180}
+];
+
+// Monthly targets
+const TGT = {budget:875000,awBudget:180000,perfBudget:695000,leads:4894,cpl:142,prx:1370,prxRate:0.28,validPrx:1096,validPrxRate:0.80,orders:220,convRate:0.045,validPrxConvRate:0.22,validPrxToLeads:0.20,cpa:3156,revenue:550616,roas:0.79,aov:2500};
+
+// Actuals (Mar 1-26, revenue from manual data Mar 1-26)
+const ACT = {revenue:309875,revenueExGst:295119,prx:701,validPrx:561,orders:123,aov:2519,convRate:0.0424};
+
+// ===== UTILS =====
+const fmt=n=>n==null?'–':'₹'+Math.round(n).toLocaleString('en-IN');
+const fmtN=n=>n==null?'–':Math.round(n).toLocaleString('en-IN');
+const pct=n=>n==null?'–':n.toFixed(2)+'%';
+const pctI=n=>n==null?'–':Math.round(n)+'%';
+function bg(cpl,avg){if(cpl==null)return'<span class="badge badge-yellow">N/A</span>';if(cpl<=avg*.85)return'<span class="badge badge-green">Efficient</span>';if(cpl<=avg*1.15)return'<span class="badge badge-yellow">Average</span>';return'<span class="badge badge-red">High Cost</span>'}
+function fnBadge(t){const m={'TOF':'badge-blue','MOF':'badge-purple','BOF':'badge-green'};return`<span class="badge ${m[t]||'badge-yellow'}">${t}</span>`}
+
+let fFrom='2026-03-01',fTo='2026-03-26';
+function gf(){return D.filter(d=>d.d>=fFrom&&d.d<=fTo)}
+function applyFilter(){fFrom=document.getElementById('dateFrom').value;fTo=document.getElementById('dateTo').value;renderAll()}
+
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));document.getElementById('tab-'+b.dataset.tab).classList.add('active');renderAll()})});
+
+let CI={};
+function dc(id){if(CI[id]){CI[id].destroy();delete CI[id]}}
+
+function renderAll(){
+const fd=gf();
+const lb=fd.map(d=>{const dt=new Date(d.d);return dt.toLocaleDateString('en-IN',{day:'numeric',month:'short'})});
+const ts=fd.reduce((s,d)=>s+d.ts,0),lps=fd.reduce((s,d)=>s+d.lp,0),tl=fd.reduce((s,d)=>s+d.tl,0),ll=fd.reduce((s,d)=>s+d.ll,0);
+const aws=fd.reduce((s,d)=>s+d.aw,0),ens=fd.reduce((s,d)=>s+d.en,0),trs=fd.reduce((s,d)=>s+d.tr,0),tof=aws+ens+trs;
+const acpl=ll>0?lps/ll:null,adl=ll/fd.length;
+const fullDays=fd.filter(d=>!d.partial);const nFull=fullDays.length;
+const banner=document.getElementById('partialBanner');if(banner)banner.style.display=fd.some(d=>d.partial)?'block':'none';
+
+// ===== OVERVIEW =====
+document.getElementById('ovKpis').innerHTML=`
+<div class="kpi-card hl"><div class="kpi-label">Total Spend</div><div class="kpi-value">${fmt(ts)}</div><div class="kpi-sub">${fd.length} days</div></div>
+<div class="kpi-card hl"><div class="kpi-label">LP Spend</div><div class="kpi-value">${fmt(lps)}</div><div class="kpi-sub">${((lps/ts)*100).toFixed(1)}% of total</div></div>
+<div class="kpi-card"><div class="kpi-label">Total Leads</div><div class="kpi-value">${fmtN(tl)}</div><div class="kpi-sub">~${Math.round(adl)}/day</div></div>
+<div class="kpi-card"><div class="kpi-label">LP CPL</div><div class="kpi-value">${fmt(acpl)}</div><div class="kpi-sub">Target: ${fmt(TGT.cpl)}</div></div>
+<div class="kpi-card"><div class="kpi-label">Awareness Spend</div><div class="kpi-value">${fmt(aws+ens+trs)}</div><div class="kpi-sub">${((tof/ts)*100).toFixed(1)}% of total</div></div>`;
+
+dc('chOvSpend');CI['chOvSpend']=new Chart(document.getElementById('chOvSpend'),{type:'bar',data:{labels:lb,datasets:[{label:'LP',data:fd.map(d=>d.lp),backgroundColor:'rgba(26,138,110,.8)',borderRadius:3},{label:'Awareness',data:fd.map(d=>d.aw),backgroundColor:'rgba(59,130,246,.7)',borderRadius:3},{label:'Engagement',data:fd.map(d=>d.en),backgroundColor:'rgba(168,85,247,.7)',borderRadius:3},{label:'Traffic',data:fd.map(d=>d.tr),backgroundColor:'rgba(251,146,60,.7)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,ticks:{callback:v=>'₹'+Math.round(v/1000)+'K'}}}}});
+
+dc('chOvLeadsCpl');CI['chOvLeadsCpl']=new Chart(document.getElementById('chOvLeadsCpl'),{type:'bar',data:{labels:lb,datasets:[{label:'Leads',data:fd.map(d=>d.ll),backgroundColor:'rgba(26,138,110,.7)',borderRadius:4,yAxisID:'y'},{label:'CPL',data:fd.map(d=>d.cpl),type:'line',borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.08)',tension:.3,fill:true,yAxisID:'y1',pointRadius:3,pointBackgroundColor:'#ef4444'},{label:'Target CPL',data:fd.map(()=>TGT.cpl),type:'line',borderColor:'#94a3b8',borderDash:[5,3],pointRadius:0,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false}},y:{position:'left',title:{display:true,text:'Leads',font:{size:10}}},y1:{position:'right',title:{display:true,text:'CPL (₹)',font:{size:10}},grid:{display:false}}}}});
+
+let tb='';camps.forEach(c=>{tb+=`<tr><td>${c.n}</td><td>${fnBadge(c.t)}</td><td class="num">${fmt(c.sp)}</td><td class="num">${fmtN(c.l)}</td><td class="num">${c.cpl?fmt(c.cpl):'–'}</td><td class="num">${pct(c.ctr)}</td><td class="num">${fmt(c.cpc)}</td><td>${bg(c.cpl,acpl||166)}</td></tr>`});
+document.querySelector('#tblCampaigns tbody').innerHTML=tb;
+
+// Revenue with full metrics
+const prxRate=ll>0?(ACT.prx/ll*100).toFixed(1):0;
+const validPrxPct=(ACT.validPrx/ACT.prx*100).toFixed(0);
+const validPrxToLeads=ll>0?(ACT.validPrx/ll*100).toFixed(1):0;
+const convLeadsToOrders=(ACT.orders/ll*100).toFixed(1);
+const convValidPrxToOrders=(ACT.orders/ACT.validPrx*100).toFixed(1);
+document.getElementById('revGrid').innerHTML=`
+<div class="rev-card"><div class="rv-label">LP Spend</div><div class="rv-value">${fmt(lps)}</div><div class="rv-sub">Performance campaigns</div></div>
+<div class="rev-card"><div class="rv-label">Total Spend</div><div class="rv-value">${fmt(ts)}</div><div class="rv-sub">Incl. Awareness</div></div>
+<div class="rev-card"><div class="rv-label">Leads</div><div class="rv-value">${fmtN(ll)}</div><div class="rv-sub">~${Math.round(adl)}/day</div></div>
+<div class="rev-card"><div class="rv-label">CPL</div><div class="rv-value">${fmt(acpl)}</div><div class="rv-sub">Target: ${fmt(TGT.cpl)}</div></div>
+<div class="rev-card"><div class="rv-label">PRX Received</div><div class="rv-value">${ACT.prx}</div><div class="rv-sub">Leads to PRX: ${prxRate}%</div></div>
+<div class="rev-card"><div class="rv-label">Valid PRX</div><div class="rv-value">${ACT.validPrx}</div><div class="rv-sub">Valid PRX %: ${validPrxPct}%</div></div>
+<div class="rev-card"><div class="rv-label">Valid PRX vs Leads</div><div class="rv-value">${validPrxToLeads}%</div><div class="rv-sub">Target: ${(TGT.validPrxToLeads*100)}%</div></div>
+<div class="rev-card"><div class="rv-label">Orders</div><div class="rv-value">${ACT.orders}</div><div class="rv-sub">Target: ${TGT.orders}</div></div>
+<div class="rev-card"><div class="rv-label">Conv Rate (Leads→Orders)</div><div class="rv-value">${convLeadsToOrders}%</div><div class="rv-sub">Target: ${(TGT.convRate*100).toFixed(1)}%</div></div>
+<div class="rev-card"><div class="rv-label">Conv Rate (Valid PRX→Orders)</div><div class="rv-value">${convValidPrxToOrders}%</div><div class="rv-sub">Target: ${(TGT.validPrxConvRate*100)}%</div></div>
+<div class="rev-card"><div class="rv-label">Revenue (GST)</div><div class="rv-value">${fmt(ACT.revenue)}</div><div class="rv-sub">AOV: ${fmt(ACT.aov)}</div></div>
+<div class="rev-card"><div class="rv-label">ROAS (LP Spend)</div><div class="rv-value" style="color:${ACT.revenue/lps<1?'#ef4444':'#22c55e'}">${(ACT.revenue/lps).toFixed(2)}</div><div class="rv-sub">Target: ${TGT.roas}</div></div>
+<div class="rev-card"><div class="rv-label">CPA</div><div class="rv-value">${fmt(lps/ACT.orders)}</div><div class="rv-sub">Target: ${fmt(TGT.cpa)}</div></div>`;
+
+// ===== LEADS TAB =====
+document.getElementById('lpKpis').innerHTML=`
+<div class="kpi-card hl"><div class="kpi-label">LP Spend</div><div class="kpi-value">${fmt(lps)}</div></div>
+<div class="kpi-card hl"><div class="kpi-label">LP Leads</div><div class="kpi-value">${fmtN(ll)}</div><div class="kpi-sub">~${Math.round(adl)}/day</div></div>
+<div class="kpi-card"><div class="kpi-label">LP CPL</div><div class="kpi-value">${fmt(acpl)}</div><div class="kpi-sub">Target: ${fmt(TGT.cpl)}</div></div>
+<div class="kpi-card"><div class="kpi-label">LP Campaigns Live</div><div class="kpi-value">${LP_CAMPS_LIVE}</div><div class="kpi-sub">MOF: 4 | BOF: 4</div></div>
+<div class="kpi-card"><div class="kpi-label">Creatives Live</div><div class="kpi-value">${TOTAL_CREATIVES_LIVE}</div><div class="kpi-sub">${VIDEO_CREATIVES_COUNT} video | ${IMAGE_CREATIVES_COUNT} image/car</div></div>`;
+
+dc('chLpLeads');CI['chLpLeads']=new Chart(document.getElementById('chLpLeads'),{type:'bar',data:{labels:lb,datasets:[{label:'LP Leads',data:fd.map(d=>d.ll),backgroundColor:fd.map(d=>d.ll>=120?'rgba(26,138,110,.8)':'rgba(251,146,60,.7)'),borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{beginAtZero:true}}}});
+
+dc('chLpCpl');CI['chLpCpl']=new Chart(document.getElementById('chLpCpl'),{type:'line',data:{labels:lb,datasets:[{label:'CPL',data:fd.map(d=>d.cpl),borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.06)',tension:.3,fill:true,pointRadius:4,pointBackgroundColor:fd.map(d=>d.cpl<=TGT.cpl?'#22c55e':'#ef4444')},{label:'Target',data:fd.map(()=>TGT.cpl),borderColor:'#22c55e',borderDash:[5,3],pointRadius:0},{label:'Avg',data:fd.map(()=>acpl),borderColor:'#94a3b8',borderDash:[3,3],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>'₹'+Math.round(v)}}}}});
+
+const lpCamps=camps.filter(c=>c.t!=='TOF');let lpTb='';lpCamps.forEach(c=>{lpTb+=`<tr><td>${c.n}</td><td class="num">${fmt(c.sp)}</td><td class="num">${fmtN(c.l)}</td><td class="num">${fmt(c.cpl)}</td><td class="num">${pct(c.ctr)}</td><td class="num">${pct(c.wctr)}</td><td>${bg(c.cpl,acpl||166)}</td></tr>`});
+document.querySelector('#tblLp tbody').innerHTML=lpTb;
+
+// Audience CPL chart
+dc('chAudCpl');CI['chAudCpl']=new Chart(document.getElementById('chAudCpl'),{type:'bar',data:{labels:auds.map(a=>a.n.length>20?a.n.substring(0,20)+'..':a.n),datasets:[{label:'CPL',data:auds.map(a=>a.cpl),backgroundColor:auds.map(a=>a.cpl<=150?'rgba(26,138,110,.8)':a.cpl<=200?'rgba(251,146,60,.7)':'rgba(239,68,68,.7)'),borderRadius:4},{label:'Target',data:auds.map(()=>TGT.cpl),type:'line',borderColor:'#22c55e',borderDash:[5,3],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{ticks:{callback:v=>'₹'+v}},y:{ticks:{font:{size:9}}}}}});
+
+dc('chCreCpl');CI['chCreCpl']=new Chart(document.getElementById('chCreCpl'),{type:'bar',data:{labels:cres.filter(c=>c.l>=5).map(c=>c.n.length>20?c.n.substring(0,20)+'..':c.n),datasets:[{label:'CPL',data:cres.filter(c=>c.l>=5).map(c=>c.cpl),backgroundColor:cres.filter(c=>c.l>=5).map(c=>c.cpl<=150?'rgba(26,138,110,.8)':c.cpl<=200?'rgba(251,146,60,.7)':'rgba(239,68,68,.7)'),borderRadius:4},{label:'Target',data:cres.filter(c=>c.l>=5).map(()=>TGT.cpl),type:'line',borderColor:'#22c55e',borderDash:[5,3],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{ticks:{callback:v=>'₹'+v}},y:{ticks:{font:{size:9}}}}}});
+
+let audTb='';auds.forEach(a=>{audTb+=`<tr><td>${a.n}</td><td class="num">${fmt(a.sp)}</td><td class="num">${fmtN(a.l)}</td><td class="num">${fmt(a.cpl)}</td><td class="num">${pct(a.ctr)}</td><td>${bg(a.cpl,acpl||166)}</td></tr>`});
+document.querySelector('#tblAud tbody').innerHTML=audTb;
+const tyBadge=t=>t==='vid'?'<span class="badge badge-purple">Video</span>':t==='car'?'<span class="badge badge-blue">Carousel</span>':'<span class="badge badge-green">Image</span>';
+let crTb='';cres.forEach(c=>{crTb+=`<tr><td>${c.n}</td><td>${tyBadge(c.ty)}</td><td class="num">${fmt(c.sp)}</td><td class="num">${fmtN(c.l)}</td><td class="num">${fmt(c.cpl)}</td><td class="num">${pct(c.ctr)}</td><td>${bg(c.cpl,acpl||166)}</td></tr>`});
+document.querySelector('#tblCre tbody').innerHTML=crTb;
+
+// Image vs Video charts
+dc('chImgVidLeads');CI['chImgVidLeads']=new Chart(document.getElementById('chImgVidLeads'),{type:'doughnut',data:{labels:['Video ('+VIDEO_CREATIVES_COUNT+')','Image/Carousel ('+IMAGE_CREATIVES_COUNT+')'],datasets:[{data:[VIDEO_LEADS,IMAGE_LEADS],backgroundColor:['rgba(139,92,246,.8)','rgba(34,197,94,.8)'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}},tooltip:{callbacks:{label:function(ctx){const total=VIDEO_LEADS+IMAGE_LEADS;return ctx.label+': '+ctx.raw+' leads ('+(ctx.raw/total*100).toFixed(1)+'%)';}}}}}});
+
+dc('chImgVidCpl');CI['chImgVidCpl']=new Chart(document.getElementById('chImgVidCpl'),{type:'bar',data:{labels:['Video','Image/Carousel','Target'],datasets:[{label:'CPL',data:[VIDEO_CPL,IMAGE_CPL,TGT.cpl],backgroundColor:['rgba(139,92,246,.8)','rgba(34,197,94,.8)','rgba(148,163,184,.5)'],borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'CPL: ₹'+Math.round(ctx.raw)}}},scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>'₹'+v}}}}});
+
+// LP Key Observations
+const obs=[];
+if(IMAGE_CPL<VIDEO_CPL){obs.push({cls:'ac-increase',tag:'INCREASE BUDGET',title:'Static Creatives Outperform Video',desc:`Image/Carousel CPL ₹${Math.round(IMAGE_CPL)} vs Video CPL ₹${Math.round(VIDEO_CPL)} — ${Math.round((VIDEO_CPL-IMAGE_CPL)/VIDEO_CPL*100)}% cheaper. Allocate more budget to static creatives and create new static variants.`})}
+else{obs.push({cls:'ac-monitor',tag:'MONITOR',title:'Video Creatives Leading',desc:`Video CPL ₹${Math.round(VIDEO_CPL)} vs Image CPL ₹${Math.round(IMAGE_CPL)}. Video is more efficient — continue investing in video creative production.`})}
+obs.push({cls:'ac-run',tag:'TOP PERFORMER',title:cres[0].n,desc:`Highest volume creative with ${cres[0].l} leads at ₹${Math.round(cres[0].cpl)} CPL. Accounts for ${(cres[0].l/(VIDEO_LEADS+IMAGE_LEADS)*100).toFixed(0)}% of all LP leads.`});
+const worstCre=cres.filter(c=>c.l>=3).sort((a,b)=>b.cpl-a.cpl)[0];
+if(worstCre)obs.push({cls:'ac-pause',tag:'PAUSE',title:worstCre.n,desc:`Worst performing creative at ₹${Math.round(worstCre.cpl)} CPL with only ${worstCre.l} leads. Pause and reallocate budget to top performers.`});
+obs.push({cls:'ac-test',tag:'TEST NEW',title:'Need More Static Creatives',desc:`Only ${IMAGE_CREATIVES_COUNT} image/carousel creatives vs ${VIDEO_CREATIVES_COUNT} video. Given static outperforms, create 3-4 new static variants around top themes (medication management, family care).`});
+const _mofS=camps.filter(c=>c.t==='MOF').reduce((s,c)=>s+c.sp,0),_mofL=camps.filter(c=>c.t==='MOF').reduce((s,c)=>s+c.l,0),_bofS=camps.filter(c=>c.t==='BOF').reduce((s,c)=>s+c.sp,0),_bofL=camps.filter(c=>c.t==='BOF').reduce((s,c)=>s+c.l,0);
+obs.push({cls:'ac-monitor',tag:'INSIGHT',title:`${LP_CAMPS_LIVE} LP Campaigns Active`,desc:`${camps.filter(c=>c.t==='MOF').length} MOF + ${camps.filter(c=>c.t==='BOF').length} BOF campaigns running. BOF delivers lower CPL (₹${Math.round(_bofS/_bofL)}) vs MOF (₹${Math.round(_mofS/_mofL)}). Consider shifting more budget to BOF.`});
+document.getElementById('lpObservations').innerHTML=obs.map(o=>`<div class="action-card ${o.cls}"><div class="action-tag">${o.tag}</div><h4>${o.title}</h4><p>${o.desc}</p></div>`).join('');
+
+// ===== CREATIVES TAB =====
+const cresSorted=[...cres].sort((a,b)=>a.cpl-b.cpl);
+const topCres=cresSorted.filter(c=>c.l>=10).slice(0,3);
+const fatigueCount=cres.filter(c=>c.fatigue==='high'||c.fatigue==='medium').length;
+const avgEngRate=(cres.reduce((s,c)=>s+c.engRate,0)/cres.length).toFixed(1);
+const vidsWithHook=cres.filter(c=>c.hookRate!==null);
+const avgHookRate=vidsWithHook.length>0?(vidsWithHook.reduce((s,c)=>s+c.hookRate,0)/vidsWithHook.length).toFixed(0):0;
+const weightedCpl=cres.reduce((s,c)=>s+c.cpl*c.l,0)/cres.reduce((s,c)=>s+c.l,0);
+const scaleCount=cres.filter(c=>c.action==='scale').length;
+const pauseCount=cres.filter(c=>c.action==='pause').length;
+
+// KPIs
+document.getElementById('crKpis').innerHTML=`
+<div class="kpi-card hl"><div class="kpi-label">Total Creatives</div><div class="kpi-value">${cres.length}</div><div class="kpi-sub">${activeCres.length} active | ${pausedCres.length} paused</div></div>
+<div class="kpi-card"><div class="kpi-label">Weighted CPL</div><div class="kpi-value">${fmt(weightedCpl)}</div><div class="kpi-sub">By lead volume</div></div>
+<div class="kpi-card"><div class="kpi-label">Best Creative</div><div class="kpi-value">${fmt(topCres[0]?.cpl)}</div><div class="kpi-sub">${topCres[0]?.n?.substring(0,20)||''}..</div></div>
+<div class="kpi-card" style="border-left:4px solid ${fatigueCount>0?'#f59e0b':'#22c55e'}"><div class="kpi-label">Fatigue Alerts</div><div class="kpi-value">${fatigueCount}</div><div class="kpi-sub">${fatigueCount>0?fatigueCount+' need rotation':'All fresh'}</div></div>
+<div class="kpi-card"><div class="kpi-label">Avg Engagement</div><div class="kpi-value">${avgEngRate}%</div><div class="kpi-sub">Hook Avg: ${avgHookRate}%</div></div>`;
+
+// Badge helpers for creative tab
+const stBadge=s=>({top:'<span class="badge badge-green">Top</span>',good:'<span class="badge badge-blue">Good</span>',avg:'<span class="badge badge-yellow">Average</span>',poor:'<span class="badge badge-red">Poor</span>',critical:'<span class="badge" style="background:#450a0a;color:#fecaca">Critical</span>'})[s]||s;
+const fatBadge=f=>({low:'<span class="badge badge-green">Low</span>',medium:'<span class="badge badge-yellow">Medium</span>',high:'<span class="badge badge-red">High</span>'})[f]||f;
+const actBadge=a=>({scale:'<span class="badge badge-green">Scale ↑</span>',maintain:'<span class="badge badge-blue">Maintain</span>',optimize:'<span class="badge badge-yellow">Optimize</span>',test:'<span class="badge badge-purple">Test</span>',pause:'<span class="badge badge-red">Pause ⏸</span>',review:'<span class="badge" style="background:#e0e7ff;color:#3730a3">Review</span>'})[a]||a;
+const benchDiff=(cpl,bench)=>{const diff=((cpl-bench)/bench*100).toFixed(0);return cpl<=bench?`<span style="color:#22c55e;font-weight:600">${diff}%</span>`:`<span style="color:#ef4444;font-weight:600">+${diff}%</span>`};
+
+// Creative Performance Cards
+const statusGrad={top:'linear-gradient(135deg,#059669,#10b981)',good:'linear-gradient(135deg,#2563eb,#3b82f6)',avg:'linear-gradient(135deg,#d97706,#f59e0b)',poor:'linear-gradient(135deg,#ea580c,#f97316)',critical:'linear-gradient(135deg,#991b1b,#dc2626)'};
+const typeLabel={vid:'Video',img:'Static',car:'Carousel'};
+const typeIconTxt={vid:'▶',img:'◻',car:'☰'};
+const whyCls={top:'cre-why-good',good:'cre-why-good',avg:'cre-why-avg',poor:'cre-why-bad',critical:'cre-why-bad'};
+const whyTitle={top:'✓',good:'✓',avg:'⚡',poor:'⚠',critical:'⚠'};
+
+// Render cards: Active first sorted by CPL, then Paused sorted by CPL
+const activeRanked=[...activeCres].sort((a,b)=>a.cpl-b.cpl);
+const pausedRanked=[...pausedCres].sort((a,b)=>a.cpl-b.cpl);
+
+function renderCreCard(c,i,isActive){
+  const igUrl=c.ig?`https://www.instagram.com/p/${c.ig}/`:'';
+  const headerClick=igUrl?`onclick="window.open('${igUrl}','_blank')"`:'';
+  return `<div class="cre-card ${isActive?'':'paused-card'}">
+<div class="cre-header" style="background:${statusGrad[c.status]}" ${headerClick}>
+  <div class="cre-rank">${i+1}</div>
+  <div class="cre-type-badge cre-type-${c.ty}">${typeLabel[c.ty]}</div>
+  <div style="text-align:center"><div class="cre-icon">${typeIconTxt[c.ty]}</div><div class="cre-icon-sub">${c.n.length>20?c.n.substring(0,20)+'…':c.n}</div></div>
+  <div class="cre-status-badge ${isActive?'cre-active-badge':'cre-paused-badge'}">${isActive?'Active':'Paused'}</div>
+  ${igUrl?`<a href="${igUrl}" target="_blank" class="cre-ig-link" title="View on Instagram">🔗</a>`:''}
+</div>
+<div class="cre-body">
+  <div class="cre-name" title="${c.n}">${c.n}</div>
+  <div class="cre-stats">
+    <div class="cre-stat"><div class="sl">Spend</div><div class="sv">${fmt(c.sp)}</div></div>
+    <div class="cre-stat"><div class="sl">Leads</div><div class="sv">${fmtN(c.l)}</div></div>
+    <div class="cre-stat"><div class="sl">CPL</div><div class="sv" style="color:${c.cpl<=c.bench?'#059669':'#dc2626'}">${fmt(c.cpl)}</div></div>
+    <div class="cre-stat"><div class="sl">CTR</div><div class="sv">${pct(c.ctr)}</div></div>
+  </div>
+  <div class="cre-copy-box"><strong>Ad:</strong> ${c.copy.length>80?c.copy.substring(0,80)+'…':c.copy}</div>
+  <div class="cre-why-box ${whyCls[c.status]}"><h5>${whyTitle[c.status]} ${c.status.toUpperCase()}</h5>${c.why.length>100?c.why.substring(0,100)+'…':c.why}</div>
+  <div class="cre-tags-compact">${stBadge(c.status)} ${fatBadge(c.fatigue)} <span class="badge badge-yellow">F:${c.freq.toFixed(1)}</span> ${c.hookRate?'<span class="badge badge-purple">H:'+c.hookRate+'%</span>':''}</div>
+</div></div>`;
+}
+
+let cardH='<div style="margin-bottom:12px"><h3 style="font-size:13px;font-weight:700;color:#059669;margin-bottom:4px">🟢 Active Creatives ('+activeCres.length+')</h3><p style="font-size:10px;color:#64748b">Click card header to view on Instagram</p></div>';
+cardH+='<div class="cre-grid">';
+activeRanked.forEach((c,i)=>{cardH+=renderCreCard(c,i,true);});
+cardH+='</div>';
+cardH+='<div style="margin:20px 0 12px"><h3 style="font-size:13px;font-weight:700;color:#ef4444;margin-bottom:4px">🔴 Paused Creatives ('+pausedCres.length+')</h3><p style="font-size:10px;color:#64748b">Previously tested — available for reactivation</p></div>';
+cardH+='<div class="cre-grid">';
+pausedRanked.forEach((c,i)=>{cardH+=renderCreCard(c,i+activeRanked.length,false);});
+cardH+='</div>';
+document.getElementById('creCardGrid').innerHTML=cardH;
+
+// Top Performing Strip
+document.getElementById('topCreStrip').innerHTML=topCres.map((c,i)=>`<div class="insight-chip ${i===0?'chip-green':i===1?'chip-blue':'chip-teal'}"><div class="chip-label">#${i+1} ${c.ty==='vid'?'Video':'Static'}</div><div class="chip-value">${fmt(c.cpl)}</div><div class="chip-sub">${c.n.substring(0,25)} | ${c.l} leads</div></div>`).join('')+`<div class="insight-chip chip-purple"><div class="chip-label">Avg Hook Rate</div><div class="chip-value">${avgHookRate}%</div><div class="chip-sub">Videos only (${vidsWithHook.length} tracked)</div></div>`;
+
+// CPL Bar Chart
+const cresForChart=[...cres].filter(c=>c.l>=2).sort((a,b)=>a.cpl-b.cpl);
+dc('chCreCplBar');CI['chCreCplBar']=new Chart(document.getElementById('chCreCplBar'),{type:'bar',data:{labels:cresForChart.map(c=>c.n.length>22?c.n.substring(0,22)+'..':c.n),datasets:[{label:'CPL',data:cresForChart.map(c=>c.cpl),backgroundColor:cresForChart.map(c=>c.cpl<=c.bench?'rgba(34,197,94,.7)':c.cpl<=c.bench*1.3?'rgba(251,146,60,.7)':'rgba(239,68,68,.6)'),borderRadius:4},{label:'Benchmark',data:cresForChart.map(c=>c.bench),type:'line',borderColor:'#94a3b8',borderDash:[5,3],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{ticks:{callback:v=>'₹'+v}},y:{ticks:{font:{size:9}}}}}});
+
+// Engagement Rate Chart
+dc('chCreEngRate');CI['chCreEngRate']=new Chart(document.getElementById('chCreEngRate'),{type:'bar',data:{labels:cres.map(c=>c.n.length>18?c.n.substring(0,18)+'..':c.n),datasets:[{label:'Engagement %',data:cres.map(c=>c.engRate),backgroundColor:cres.map(c=>c.engRate>=4?'rgba(34,197,94,.7)':c.engRate>=2?'rgba(59,130,246,.6)':'rgba(239,68,68,.5)'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>v+'%'}},y:{ticks:{font:{size:9}}}}}});
+
+// Fatigue Chart
+dc('chCreFatigue');CI['chCreFatigue']=new Chart(document.getElementById('chCreFatigue'),{type:'bar',data:{labels:cres.map(c=>c.n.length>18?c.n.substring(0,18)+'..':c.n),datasets:[{label:'Frequency',data:cres.map(c=>c.freq),backgroundColor:cres.map(c=>c.freq>=3?'rgba(239,68,68,.7)':c.freq>=2?'rgba(251,146,60,.7)':'rgba(34,197,94,.6)'),borderRadius:4},{label:'Fatigue Zone (3.0)',data:cres.map(()=>3),type:'line',borderColor:'#ef4444',borderDash:[5,3],pointRadius:0},{label:'Watch Zone (2.0)',data:cres.map(()=>2),type:'line',borderColor:'#f59e0b',borderDash:[3,3],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{title:{display:true,text:'Frequency',font:{size:10}}},y:{ticks:{font:{size:9}}}}}});
+
+// Hook Rate Chart (videos only)
+dc('chCreHook');CI['chCreHook']=new Chart(document.getElementById('chCreHook'),{type:'bar',data:{labels:vidsWithHook.map(c=>c.n.length>20?c.n.substring(0,20)+'..':c.n),datasets:[{label:'Hook Rate %',data:vidsWithHook.map(c=>c.hookRate),backgroundColor:vidsWithHook.map(c=>c.hookRate>=40?'rgba(34,197,94,.7)':c.hookRate>=30?'rgba(251,146,60,.7)':'rgba(239,68,68,.5)'),borderRadius:4},{label:'Good (40%)',data:vidsWithHook.map(()=>40),type:'line',borderColor:'#22c55e',borderDash:[5,3],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{ticks:{callback:v=>v+'%'},max:70},y:{ticks:{font:{size:9}}}}}});
+
+// Fatigue Insights
+document.getElementById('fatigueInsights').innerHTML=`
+<div class="action-card ac-pause"><div class="action-tag">HIGH FATIGUE</div><h4>"All his meds video" — Freq 3.8</h4><p>Your top creative is showing fatigue. Each user has seen it ~4 times. CPL likely rising. Create 2-3 new video variants with same messaging but different visual hooks to rotate immediately.</p></div>
+<div class="action-card ac-decrease"><div class="action-tag">MEDIUM FATIGUE</div><h4>"Life without pillup video" — Freq 2.6</h4><p>Approaching fatigue threshold. CPL ₹179 is manageable but watch closely. If CPL rises above ₹200 in next 3 days, rotate with a fresh creative.</p></div>
+<div class="action-card ac-run"><div class="action-tag">FRESH</div><h4>Static Creatives — Low Frequency</h4><p>"Samajhdari" (1.9) and "Struggling with meds" (1.7) still have runway. These are also best CPL performers. Scale spend before they reach fatigue threshold of 2.5.</p></div>
+<div class="action-card ac-monitor"><div class="action-tag">BENCHMARKS</div><h4>Fatigue Thresholds</h4><p><strong>Low:</strong> < 2.0 (safe to scale) | <strong>Medium:</strong> 2.0-3.0 (prepare rotation) | <strong>High:</strong> > 3.0 (rotate now). Industry avg for lead gen: 2.5-3.0.</p></div>`;
+
+// Hook Performance
+const bestHook=vidsWithHook.length>0?[...vidsWithHook].sort((a,b)=>b.hookRate-a.hookRate)[0]:null;
+const worstHook=vidsWithHook.length>0?[...vidsWithHook].sort((a,b)=>a.hookRate-b.hookRate)[0]:null;
+document.getElementById('hookStrip').innerHTML=`
+<div class="insight-chip chip-green"><div class="chip-label">Best Hook Rate</div><div class="chip-value">${bestHook?bestHook.hookRate+'%':'–'}</div><div class="chip-sub">${bestHook?bestHook.n.substring(0,22):''}</div></div>
+<div class="insight-chip chip-red"><div class="chip-label">Worst Hook Rate</div><div class="chip-value">${worstHook?worstHook.hookRate+'%':'–'}</div><div class="chip-sub">${worstHook?worstHook.n.substring(0,22):''}</div></div>
+<div class="insight-chip chip-blue"><div class="chip-label">Avg Hook Rate</div><div class="chip-value">${avgHookRate}%</div><div class="chip-sub">Industry benchmark: 35-45%</div></div>
+<div class="insight-chip chip-amber"><div class="chip-label">Videos Tracked</div><div class="chip-value">${vidsWithHook.length}</div><div class="chip-sub">${vidsWithHook.filter(c=>c.hookRate>=40).length} above 40% threshold</div></div>`;
+
+document.getElementById('hookInsights').innerHTML=`
+<div class="action-card ac-run"><div class="action-tag">TOP HOOK</div><h4>"10 sec meds Video" — 55% Hook Rate</h4><p>Highest hook retention but terrible CPL (₹803). The short format grabs attention effectively. Reuse this hook style (fast visual, immediate problem statement) in a longer creative with proper conversion flow.</p></div>
+<div class="action-card ac-run"><div class="action-tag">TOP HOOK</div><h4>"Testimonial video" — 52% Hook Rate</h4><p>Trust-based opening works. Real person = attention. But ₹270 CPL means post-hook content isn't converting. Fix: keep testimonial hook (0-3 sec), add clearer product demo (3-10 sec), stronger CTA (10-15 sec).</p></div>
+<div class="action-card ac-decrease"><div class="action-tag">WEAK HOOK</div><h4>"Everyday meds" & "Life without pillup" — < 30%</h4><p>70%+ viewers scroll past in first 3 seconds. These need completely new opening hooks. Test: start with a question, start with a surprising stat, start with a close-up of medicine pouches.</p></div>
+<div class="action-card ac-monitor"><div class="action-tag">INSIGHT</div><h4>Hook Rate vs CPL: No Direct Correlation</h4><p>Highest hook rates (55%, 52%) have worst CPL. Mid-range hooks (38-45%) actually convert best. The ideal creative grabs attention AND maintains intent through to CTA — not just attention.</p></div>`;
+
+// Placement-Based Creative Insights
+document.getElementById('placementCreInsights').innerHTML=`
+<div class="action-card ac-run"><div class="action-tag">FACEBOOK FEED</div><h4>Videos Perform Best Here</h4><p>"All his meds video" and "Parents Meds Video" get ~65% of leads from Facebook Feed. Autoplay drives engagement. Optimize video thumbnails for silent autoplay with text overlays.</p></div>
+<div class="action-card ac-increase"><div class="action-tag">INSTAGRAM FEED</div><h4>Static Images Win on IG</h4><p>"Samajhdari_static" gets ~40% of leads from IG Feed at ~₹98 CPL. Square format with bold Hindi/English text overlay performs best. Create more IG-optimized statics.</p></div>
+<div class="action-card ac-monitor"><div class="action-tag">STORIES & REELS</div><h4>High CTR, Higher CPL</h4><p>Stories show 2.14% CTR (highest) but ₹238 CPL. Users engage but don't convert. Test shorter 15-sec story-specific creatives with stronger CTA in first 3 seconds.</p></div>
+<div class="action-card ac-pause"><div class="action-tag">AUDIENCE NETWORK</div><h4>Low Quality Placements</h4><p>Audience Network: ₹290 CPL with 0.52% CTR. Leads here likely have lower intent. Consider excluding or creating specific low-cost awareness creatives for it.</p></div>`;
+
+// Creative Testing Insights
+document.getElementById('testingInsights').innerHTML=`
+<div class="action-card ac-run"><div class="action-tag">PROVEN</div><h4>Problem-Agitation Messaging Wins</h4><p>"All his meds" and "Struggling with meds" — creatives highlighting the pain of managing multiple medications outperform feature-focused ones by 35% on CPL. Lead with the problem, not the product.</p></div>
+<div class="action-card ac-run"><div class="action-tag">PROVEN</div><h4>Static CPL ${fmt(IMAGE_CPL)} vs Video ${fmt(VIDEO_CPL)}</h4><p>Image creatives deliver 25-30% lower CPL consistently. But videos drive 3x more volume (${VIDEO_LEADS} vs ${IMAGE_LEADS} leads). Strategy: videos for volume, statics for efficiency.</p></div>
+<div class="action-card ac-monitor"><div class="action-tag">LEARNING</div><h4>Carousel: Highest CTR (6.2%), Worst Conversion</h4><p>"Let Pillup Care Carousel" has highest CTR but ₹326 CPL. Users swipe but don't convert. Test carousel with stronger CTA on first card and simpler lead form on last card.</p></div>
+<div class="action-card ac-monitor"><div class="action-tag">LEARNING</div><h4>High Engagement ≠ High Conversion</h4><p>"Daily Meds pouch" (5.2% eng, ₹257 CPL) and "Testimonial" (6.1% eng, ₹270 CPL) show high engagement but poor conversion. The ad-to-landing-page messaging gap is the likely issue.</p></div>`;
+
+// Actions Needed
+document.getElementById('creActionGrid').innerHTML=`
+<div class="action-card ac-pause"><div class="action-tag">PAUSE IMMEDIATELY</div><h4>"10 sec meds Video" — ₹803 CPL</h4><p>3 leads at ₹2,410 spend. 387% above benchmark. Not converting despite 55% hook rate. The short format doesn't give enough context for a health purchase decision. Pause.</p></div>
+<div class="action-card ac-pause"><div class="action-tag">PAUSE IMMEDIATELY</div><h4>"Pillup makes simple static" — ₹391 CPL</h4><p>Only 2 leads at ₹784 spend. 190% above benchmark. Feature-focused messaging ("makes it simple") not resonating. Pause and replace with problem-focused variant.</p></div>
+<div class="action-card ac-decrease"><div class="action-tag">ROTATE URGENTLY</div><h4>"All his meds video" — Frequency 3.8</h4><p>Still #1 volume driver (771 leads) but frequency is critical. Create 2-3 new cuts: different opening hooks, shorter versions (15s/30s), different CTAs. Test within same ad sets to maintain audience learning.</p></div>
+<div class="action-card ac-decrease"><div class="action-tag">FIX LANDING PAGE</div><h4>"Daily Meds pouch video" — High Eng, Bad CPL</h4><p>₹257 CPL despite 5.2% engagement and 45% hook rate. Users are interested but not converting. The ad promise likely doesn't match landing page content. Audit LP alignment.</p></div>
+<div class="action-card ac-increase"><div class="action-tag">SCALE UP</div><h4>"Samajhdari_static" — Best ROI</h4><p>₹111 CPL, 242 leads. 18% below benchmark. Increase spend 30%. Create 2-3 visual variants (different colors, text sizes, layouts) to extend shelf life before fatigue hits.</p></div>
+<div class="action-card ac-increase"><div class="action-tag">SCALE UP</div><h4>"Struggling with meds Static" — 2nd Best</h4><p>₹118 CPL, 139 leads. 13% below benchmark. Scale spend 25%. Test different color schemes and Hindi vs English text to find more efficient variants.</p></div>`;
+
+// New Creative Recommendations
+document.getElementById('newCreRecs').innerHTML=`
+<div class="action-card ac-test"><div class="action-tag">CREATE NEW</div><h4>Static: "Before vs After" Comparison</h4><p>Leverage proven pain-point messaging. Show chaotic medication management (left) vs PillUp's organized pouch system (right). Split-screen format works on both FB Feed and IG. Based on "Samajhdari" success.</p></div>
+<div class="action-card ac-test"><div class="action-tag">CREATE NEW</div><h4>Video: Testimonial + Pain Point Hybrid</h4><p>Combine highest hook rate (testimonial, 52%) with highest conversion messaging (pain-point). Start with real user hook (0-3s), show medication struggle (3-8s), PillUp solution (8-12s), CTA (12-15s).</p></div>
+<div class="action-card ac-test"><div class="action-tag">CREATE NEW</div><h4>Static: "Numbers That Matter"</h4><p>Data-driven static: "1 pouch. 7 medicines. 0 confusion." Similar to "Samajhdari" approach but bold numbers. This data-first angle hasn't been tested — likely to work with the 25-44 analytical audience.</p></div>
+<div class="action-card ac-test"><div class="action-tag">CREATE NEW</div><h4>Video: 15-sec Story/Reels Cut</h4><p>Reels/Stories has highest CTR but worst CPL. Create native vertical 15-sec cuts: fast hook (2s), problem (5s), solution (5s), CTA (3s). Optimize for sound-off with text overlays.</p></div>
+<div class="action-card ac-test"><div class="action-tag">CREATE NEW</div><h4>Carousel: Product Walkthrough</h4><p>Current carousel has 6.2% CTR (highest!). New concept: Card 1 = hook question, Cards 2-3 = problem visualization, Card 4 = PillUp solution, Card 5 = CTA + offer. Fix conversion gap.</p></div>
+<div class="action-card ac-test"><div class="action-tag">CREATE NEW</div><h4>UGC-Style Video (High Priority)</h4><p>Zero UGC content in current mix. Create 3-4 authentic "customer talking to camera" videos. UGC typically reduces CPL 20-30% in health/wellness. Source from existing PillUp customers for authenticity.</p></div>`;
+
+// ===== FUNNEL TAB =====
+const tofS=camps.filter(c=>c.t==='TOF').reduce((s,c)=>s+c.sp,0);
+const mofS=camps.filter(c=>c.t==='MOF').reduce((s,c)=>s+c.sp,0);
+const bofS=camps.filter(c=>c.t==='BOF').reduce((s,c)=>s+c.sp,0);
+const tofL=camps.filter(c=>c.t==='TOF').reduce((s,c)=>s+c.l,0);
+const mofL=camps.filter(c=>c.t==='MOF').reduce((s,c)=>s+c.l,0);
+const bofL=camps.filter(c=>c.t==='BOF').reduce((s,c)=>s+c.l,0);
+
+document.getElementById('fnKpis').innerHTML=`
+<div class="kpi-card" style="border-left:4px solid #3b82f6"><div class="kpi-label">TOF Spend</div><div class="kpi-value">${fmt(tofS)}</div><div class="kpi-sub">${(tofS/ts*100).toFixed(1)}% | ${tofL} leads</div></div>
+<div class="kpi-card" style="border-left:4px solid #8b5cf6"><div class="kpi-label">MOF Spend</div><div class="kpi-value">${fmt(mofS)}</div><div class="kpi-sub">${(mofS/ts*100).toFixed(1)}% | ${mofL} leads</div></div>
+<div class="kpi-card" style="border-left:4px solid #22c55e"><div class="kpi-label">BOF Spend</div><div class="kpi-value">${fmt(bofS)}</div><div class="kpi-sub">${(bofS/ts*100).toFixed(1)}% | ${bofL} leads</div></div>
+<div class="kpi-card"><div class="kpi-label">MOF CPL</div><div class="kpi-value">${fmt(mofL>0?mofS/mofL:null)}</div></div>
+<div class="kpi-card"><div class="kpi-label">BOF CPL</div><div class="kpi-value">${fmt(bofL>0?bofS/bofL:null)}</div></div>`;
+
+document.getElementById('funnelVisual').innerHTML=`
+<div class="funnel-stage"><div class="funnel-box" style="background:linear-gradient(135deg,#3b82f6,#2563eb)"><h3>${fmt(tofS)}</h3><p>TOF: Awareness + Traffic + Engagement</p></div><div class="funnel-rate">~${fmtN(Math.round(tofS/1.78*1000/1000000))}M+ impressions</div></div>
+<div class="funnel-arrow">→</div>
+<div class="funnel-stage"><div class="funnel-box" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed)"><h3>${fmtN(mofL)} leads</h3><p>MOF: Retargeting & LAL</p></div><div class="funnel-rate">${fmt(mofL>0?mofS/mofL:0)} CPL</div></div>
+<div class="funnel-arrow">→</div>
+<div class="funnel-stage"><div class="funnel-box" style="background:linear-gradient(135deg,#22c55e,#16a34a)"><h3>${fmtN(bofL)} leads</h3><p>BOF: Sales & Conversions</p></div><div class="funnel-rate">${fmt(bofL>0?bofS/bofL:0)} CPL</div></div>
+<div class="funnel-arrow">→</div>
+<div class="funnel-stage"><div class="funnel-box" style="background:linear-gradient(135deg,#f59e0b,#d97706)"><h3>${ACT.orders} orders</h3><p>Revenue: ${fmt(ACT.revenue)}</p></div><div class="funnel-rate">${(ACT.convRate*100).toFixed(1)}% conv rate</div></div>`;
+
+dc('chFnPie');CI['chFnPie']=new Chart(document.getElementById('chFnPie'),{type:'doughnut',data:{labels:['TOF','MOF','BOF'],datasets:[{data:[tofS,mofS,bofS],backgroundColor:['rgba(59,130,246,.8)','rgba(139,92,246,.8)','rgba(34,197,94,.8)'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}}}});
+
+dc('chFnDaily');CI['chFnDaily']=new Chart(document.getElementById('chFnDaily'),{type:'bar',data:{labels:lb,datasets:[{label:'TOF',data:fd.map(d=>d.aw+d.en+d.tr),backgroundColor:'rgba(59,130,246,.7)',borderRadius:3},{label:'MOF',data:fd.map(d=>d.lp*.4),backgroundColor:'rgba(139,92,246,.7)',borderRadius:3},{label:'BOF',data:fd.map(d=>d.lp*.6),backgroundColor:'rgba(34,197,94,.7)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,ticks:{callback:v=>'₹'+Math.round(v/1000)+'K'}}}}});
+
+let fnTb='';camps.forEach(c=>{fnTb+=`<tr><td>${c.n}</td><td>${fnBadge(c.t)}</td><td class="num">${fmt(c.sp)}</td><td class="num">${fmtN(c.l)}</td><td class="num">${c.cpl?fmt(c.cpl):'–'}</td><td class="num">${pct(c.ctr)}</td><td class="num">${fmt(c.cpc)}</td></tr>`});
+document.querySelector('#tblFunnel tbody').innerHTML=fnTb;
+
+// ===== INSIGHTS TAB =====
+const bestCplDay=fullDays.reduce((b,d)=>d.cpl<b.cpl?d:b,fullDays[0]);
+const worstCplDay=fullDays.reduce((w,d)=>d.cpl>w.cpl?d:w,fullDays[0]);
+const peakLeadDay=fullDays.reduce((b,d)=>d.ll>b.ll?d:b,fullDays[0]);
+const lowLeadDay=fullDays.reduce((w,d)=>d.ll<w.ll?d:w,fullDays[0]);
+const dfmt=d=>new Date(d.d).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+
+document.getElementById('insKpis').innerHTML=`
+<div class="kpi-card hl"><div class="kpi-label">Daily Avg Leads</div><div class="kpi-value">${Math.round(adl)}</div><div class="kpi-sub">Need ${Math.round(TGT.leads/31)}/day for target</div></div>
+<div class="kpi-card" style="border-left:4px solid ${acpl<=TGT.cpl?'#22c55e':'#ef4444'}"><div class="kpi-label">CPL Status</div><div class="kpi-value">${fmt(acpl)}</div><div class="kpi-sub">${acpl>TGT.cpl?'Above':'Below'} target ${fmt(TGT.cpl)}</div></div>
+<div class="kpi-card"><div class="kpi-label">Budget Pace</div><div class="kpi-value">${pctI(ts/TGT.budget*100)}</div><div class="kpi-sub">${fmt(ts)} of ${fmt(TGT.budget)}</div></div>
+<div class="kpi-card"><div class="kpi-label">Lead Pace</div><div class="kpi-value">${pctI(ll/TGT.leads*100)}</div><div class="kpi-sub">${fmtN(ll)} of ${fmtN(TGT.leads)}</div></div>
+<div class="kpi-card"><div class="kpi-label">Revenue Pace</div><div class="kpi-value">${pctI(ACT.revenue/TGT.revenue*100)}</div><div class="kpi-sub">${fmt(ACT.revenue)} of ${fmt(TGT.revenue)}</div></div>`;
+
+// --- Lead Volume Trend ---
+document.getElementById('leadVolStrip').innerHTML=`
+<div class="insight-chip chip-green"><div class="chip-label">Peak Day</div><div class="chip-value">${peakLeadDay.ll} leads</div><div class="chip-sub">${dfmt(peakLeadDay)} — best performance</div></div>
+<div class="insight-chip chip-red"><div class="chip-label">Low Day</div><div class="chip-value">${lowLeadDay.ll} leads</div><div class="chip-sub">${dfmt(lowLeadDay)} — lowest output</div></div>
+<div class="insight-chip chip-blue"><div class="chip-label">Avg Leads/Day</div><div class="chip-value">${Math.round(adl)}</div><div class="chip-sub">Target: ${Math.round(TGT.leads/31)}/day</div></div>
+<div class="insight-chip chip-teal"><div class="chip-label">Total (${fd.length} days)</div><div class="chip-value">${fmtN(ll)}</div><div class="chip-sub">${pctI(ll/TGT.leads*100)} of monthly target</div></div>`;
+
+dc('chInsLeadVol');CI['chInsLeadVol']=new Chart(document.getElementById('chInsLeadVol'),{type:'bar',data:{labels:lb,datasets:[{label:'Daily Leads',data:fd.map(d=>d.ll),backgroundColor:fd.map(d=>d.ll>=Math.round(adl)?'rgba(26,138,110,.75)':'rgba(251,146,60,.65)'),borderRadius:5},{label:'Avg ('+Math.round(adl)+')',data:fd.map(()=>Math.round(adl)),type:'line',borderColor:'#94a3b8',borderDash:[5,3],pointRadius:0,fill:false},{label:'Target ('+Math.round(TGT.leads/31)+')',data:fd.map(()=>Math.round(TGT.leads/31)),type:'line',borderColor:'#22c55e',borderDash:[3,3],pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false}},y:{beginAtZero:true}}}});
+
+// --- Lead Cost Efficiency ---
+const cplTrend=fd.length>=6?(fd.slice(-3).reduce((s,d)=>s+d.cpl,0)/3)<(fd.slice(0,3).reduce((s,d)=>s+d.cpl,0)/3)?'Decreasing':'Increasing':'Stable';
+const bestCplCamp=camps.filter(c=>c.cpl).sort((a,b)=>a.cpl-b.cpl)[0];
+const worstCplCamp=camps.filter(c=>c.cpl).sort((a,b)=>b.cpl-a.cpl)[0];
+
+document.getElementById('cplStrip').innerHTML=`
+<div class="insight-chip ${acpl<=TGT.cpl?'chip-green':'chip-red'}"><div class="chip-label">Current CPL</div><div class="chip-value">${fmt(acpl)}</div><div class="chip-sub">Target: ${fmt(TGT.cpl)} | Gap: ${fmt(Math.abs(acpl-TGT.cpl))}</div></div>
+<div class="insight-chip ${cplTrend==='Decreasing'?'chip-green':'chip-amber'}"><div class="chip-label">CPL Trend</div><div class="chip-value">${cplTrend}</div><div class="chip-sub">Last 3 days vs First 3 days</div></div>
+<div class="insight-chip chip-green"><div class="chip-label">Best Campaign CPL</div><div class="chip-value">${fmt(bestCplCamp.cpl)}</div><div class="chip-sub">${bestCplCamp.n.length>25?bestCplCamp.n.substring(0,25)+'..':bestCplCamp.n}</div></div>
+<div class="insight-chip chip-red"><div class="chip-label">Worst Campaign CPL</div><div class="chip-value">${fmt(worstCplCamp.cpl)}</div><div class="chip-sub">${worstCplCamp.n.length>25?worstCplCamp.n.substring(0,25)+'..':worstCplCamp.n}</div></div>`;
+
+dc('chInsCpl');CI['chInsCpl']=new Chart(document.getElementById('chInsCpl'),{type:'line',data:{labels:lb,datasets:[{label:'Daily CPL',data:fd.map(d=>d.cpl),borderColor:'#1a1a2e',backgroundColor:'rgba(26,26,46,.05)',tension:.3,fill:true,pointRadius:5,pointBackgroundColor:fd.map(d=>d.cpl<=TGT.cpl?'#22c55e':d.cpl<=180?'#f59e0b':'#ef4444')},{label:'Target (₹'+TGT.cpl+')',data:fd.map(()=>TGT.cpl),borderColor:'#22c55e',borderDash:[5,3],pointRadius:0},{label:'Danger (₹200+)',data:fd.map(()=>200),borderColor:'#ef4444',borderDash:[3,3],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>'₹'+v}}}}});
+
+document.getElementById('cplInsights').innerHTML=`
+<div class="action-card ac-run"><div class="action-tag">BEST CPL</div><h4>${bestCplCamp.n}</h4><p>${fmt(bestCplCamp.cpl)} CPL with ${bestCplCamp.l} leads. ${Math.round((1-bestCplCamp.cpl/acpl)*100)}% below average CPL. This campaign sets the benchmark for efficiency.</p></div>
+<div class="action-card ac-pause"><div class="action-tag">WORST CPL</div><h4>${worstCplCamp.n}</h4><p>${fmt(worstCplCamp.cpl)} CPL — ${Math.round((worstCplCamp.cpl/TGT.cpl-1)*100)}% above target. ${worstCplCamp.l} leads at ${fmt(worstCplCamp.sp)} spend. Needs immediate optimization or budget reduction.</p></div>`;
+
+document.getElementById('cplActionNote').innerHTML=`<strong>Action Plan to Bring CPL to Target (${fmt(TGT.cpl)}):</strong><br>
+1. <strong>Reallocate 30% budget</strong> from high-CPL campaigns (${worstCplCamp.n.split('|')[0].trim()}, Goodflip) to low-CPL campaigns (LP Campaign 1 Dec, Different Audience).<br>
+2. <strong>Scale static creatives</strong> — image CPL ${fmt(IMAGE_CPL)} vs video ${fmt(VIDEO_CPL)}. Create 3-4 new static variants.<br>
+3. <strong>Pause underperformers</strong> — creatives with CPL > ₹250 and audiences with CPL > ₹250 (Delivery App, Website Audience).<br>
+4. <strong>Focus on South India + Open Audience</strong> — consistently lowest CPL at ₹116-148. Increase geo-targeting budget for Bangalore, Hyderabad, Chennai.`;
+
+// --- Placement Performance ---
+dc('chPlaceLeads');CI['chPlaceLeads']=new Chart(document.getElementById('chPlaceLeads'),{type:'bar',data:{labels:places.map(p=>p.n),datasets:[{label:'Leads',data:places.map(p=>p.l),backgroundColor:places.map(p=>p.cpl<=160?'rgba(34,197,94,.7)':p.cpl<=200?'rgba(251,146,60,.7)':'rgba(239,68,68,.6)'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{ticks:{font:{size:10}}}}}});
+
+dc('chPlaceCpl');CI['chPlaceCpl']=new Chart(document.getElementById('chPlaceCpl'),{type:'bar',data:{labels:places.map(p=>p.n),datasets:[{label:'CPL',data:places.map(p=>p.cpl),backgroundColor:places.map(p=>p.cpl<=160?'rgba(34,197,94,.7)':p.cpl<=200?'rgba(251,146,60,.7)':'rgba(239,68,68,.6)'),borderRadius:4},{label:'Target',data:places.map(()=>TGT.cpl),type:'line',borderColor:'#22c55e',borderDash:[5,3],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{ticks:{callback:v=>'₹'+v}},y:{ticks:{font:{size:10}}}}}});
+
+const plBestCpl=[...places].sort((a,b)=>a.cpl-b.cpl)[0];
+const plWorstCpl=[...places].sort((a,b)=>b.cpl-a.cpl)[0];
+const plBestCtr=[...places].sort((a,b)=>b.ctr-a.ctr)[0];
+const plMostVol=[...places].sort((a,b)=>b.l-a.l)[0];
+
+document.getElementById('placementStrip').innerHTML=`
+<div class="insight-chip chip-green"><div class="chip-label">Best Placement</div><div class="chip-value">${plBestCpl.n}</div><div class="chip-sub">${fmt(plBestCpl.cpl)} CPL | ${plBestCpl.l} leads</div></div>
+<div class="insight-chip chip-blue"><div class="chip-label">Highest CTR</div><div class="chip-value">${plBestCtr.n}</div><div class="chip-sub">${plBestCtr.ctr}% CTR | ${plBestCtr.l} leads</div></div>
+<div class="insight-chip chip-purple"><div class="chip-label">Most Volume</div><div class="chip-value">${plMostVol.n}</div><div class="chip-sub">${plMostVol.l} leads (${(plMostVol.l/ll*100).toFixed(0)}% of total)</div></div>
+<div class="insight-chip chip-red"><div class="chip-label">Worst Placement</div><div class="chip-value">${plWorstCpl.n}</div><div class="chip-sub">${fmt(plWorstCpl.cpl)} CPL — consider reducing</div></div>`;
+
+// --- Audience Performance ---
+dc('chAgeLeads');CI['chAgeLeads']=new Chart(document.getElementById('chAgeLeads'),{type:'bar',data:{labels:ageGrp.map(a=>a.n),datasets:[{label:'Leads',data:ageGrp.map(a=>a.l),backgroundColor:['rgba(26,138,110,.85)','rgba(26,138,110,.7)','rgba(251,146,60,.7)','rgba(251,146,60,.5)','rgba(239,68,68,.5)','rgba(239,68,68,.4)'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{beginAtZero:true}}}});
+
+dc('chGenderLeads');CI['chGenderLeads']=new Chart(document.getElementById('chGenderLeads'),{type:'doughnut',data:{labels:genderGrp.map(g=>g.n+' ('+g.l+')'),datasets:[{data:genderGrp.map(g=>g.l),backgroundColor:['rgba(59,130,246,.8)','rgba(236,72,153,.8)','rgba(148,163,184,.6)'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}}}});
+
+dc('chLocLeads');CI['chLocLeads']=new Chart(document.getElementById('chLocLeads'),{type:'bar',data:{labels:locGrp.map(l=>l.n),datasets:[{label:'Leads',data:locGrp.map(l=>l.l),backgroundColor:locGrp.map(l=>l.cpl<=TGT.cpl?'rgba(34,197,94,.7)':l.cpl<=170?'rgba(251,146,60,.7)':'rgba(239,68,68,.6)'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{ticks:{font:{size:10}}}}}});
+
+dc('chAudSegCpl');CI['chAudSegCpl']=new Chart(document.getElementById('chAudSegCpl'),{type:'bar',data:{labels:ageGrp.map(a=>a.n),datasets:[{label:'CPL',data:ageGrp.map(a=>a.cpl),backgroundColor:ageGrp.map(a=>a.cpl<=TGT.cpl?'rgba(34,197,94,.7)':a.cpl<=180?'rgba(251,146,60,.7)':'rgba(239,68,68,.6)'),borderRadius:5},{label:'Target',data:ageGrp.map(()=>TGT.cpl),type:'line',borderColor:'#22c55e',borderDash:[5,3],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>'₹'+v}}}}});
+
+document.getElementById('audienceInsights').innerHTML=`
+<div class="action-card ac-increase"><div class="action-tag">AGE INSIGHT</div><h4>25-44 Age Group = Core Audience (63%)</h4><p>${ageGrp[0].l+ageGrp[1].l} leads from 25-44 at ${fmt(ageGrp[0].cpl)}-${fmt(ageGrp[1].cpl)} CPL — most efficient segment. These are adult children managing parents' medications. Double down on this demographic.</p></div>
+<div class="action-card ac-monitor"><div class="action-tag">GENDER INSIGHT</div><h4>Male Skew at ${(genderGrp[0].l/ll*100).toFixed(0)}%</h4><p>Male leads dominate with ${genderGrp[0].l} leads at ${fmt(genderGrp[0].cpl)} CPL vs Female ${fmt(genderGrp[1].cpl)}. Consider testing female-focused creatives (mother/caregiver angle) to tap underserved segment.</p></div>
+<div class="action-card ac-increase"><div class="action-tag">LOCATION INSIGHT</div><h4>South India Leads at Lowest CPL</h4><p>Bangalore (${fmt(locGrp[0].cpl)}), Chennai (${fmt(locGrp[2].cpl)}), Hyderabad (${fmt(locGrp[1].cpl)}) — all at or near target CPL. South India accounts for ${((locGrp[0].l+locGrp[1].l+locGrp[2].l)/ll*100).toFixed(0)}% of leads. Increase geo-targeting.</p></div>
+<div class="action-card ac-decrease"><div class="action-tag">CPL BY SEGMENT</div><h4>55+ Age Group: High CPL, Low Volume</h4><p>55-64 at ${fmt(ageGrp[4].cpl)} CPL with ${ageGrp[4].l} leads, 65+ at ${fmt(ageGrp[5].cpl)} with ${ageGrp[5].l} leads. Consider reducing bid/budget for 55+ unless downstream conversion is significantly higher.</p></div>`;
+
+// --- Optimization Opportunities ---
+document.getElementById('optimizationGrid').innerHTML=`
+<div class="action-card ac-increase"><div class="action-tag">INCREASE BUDGET</div><h4>LP Campaign | 1 Dec + Different Audience</h4><p>Combined ~₹119 avg CPL with 704 leads — your two best campaigns. Increase budget 25-30%. Open Audience South India and "Away from home" audiences are scaling winners.</p></div>
+<div class="action-card ac-increase"><div class="action-tag">RECOMMENDATION</div><h4>Create More Static Creatives</h4><p>Static CPL ${fmt(IMAGE_CPL)} vs Video ${fmt(VIDEO_CPL)}. Only ${IMAGE_CREATIVES_COUNT} static creatives live vs ${VIDEO_CREATIVES_COUNT} video. Create 4-5 new statics around "Samajhdari" and "Struggling with meds" themes.</p></div>
+<div class="action-card ac-run"><div class="action-tag">KEEP ACTIVE</div><h4>NLP Advantage+ Campaign</h4><p>Improving trend: W1 ₹261 → W2 ₹156. Meta's algorithm is optimizing well. Don't touch — let it continue learning. 146 leads so far.</p></div>
+<div class="action-card ac-run"><div class="action-tag">KEEP ACTIVE</div><h4>Awareness + Traffic TOF Campaigns</h4><p>Traffic at ₹0.51 CPC feeds retargeting pool. Awareness building brand. Combined ₹${fmtN(Math.round(tof/1000))}K spend is investment in future LP campaign efficiency.</p></div>
+<div class="action-card ac-decrease"><div class="action-tag">DECREASE BUDGET</div><h4>LP Campaign 2 (Tech-Savvy)</h4><p>Highest spend ₹60.6K but ₹198 CPL — 39% above target. Reduce 30% and reallocate to LP Campaign 1 Dec and Different Audience Sales.</p></div>
+<div class="action-card ac-decrease"><div class="action-tag">DECREASE BUDGET</div><h4>LP Goodflip Data List</h4><p>₹242 CPL with only 78 leads. 71% above target. Reduce 40% unless downstream PRX conversion is significantly better than other campaigns.</p></div>
+<div class="action-card ac-monitor"><div class="action-tag">NEEDS ATTENTION</div><h4>ROAS ${(ACT.revenue/lps).toFixed(2)} — Below Breakeven</h4><p>CPA ${fmt(lps/ACT.orders)} vs AOV ${fmt(ACT.aov)}. First-order unprofitable. Need LTV data to justify, or reduce CPL to ${fmt(TGT.cpl)} to improve unit economics.</p></div>
+<div class="action-card ac-monitor"><div class="action-tag">NEEDS ATTENTION</div><h4>PRX Rate at ${(ACT.prx/ll*100).toFixed(1)}%</h4><p>76% of leads never submit prescriptions. Improve: (1) Sales team response < 5 min, (2) Simplify prescription upload UX, (3) Add WhatsApp prescription submission.</p></div>
+<div class="action-card ac-pause"><div class="action-tag">PAUSE</div><h4>Delivery App & Website Audiences</h4><p>Delivery App: 12 leads at ₹274. Website: 52 leads at ₹255. Combined ₹16.5K for 64 leads. Pause both and redirect budget to top performers.</p></div>
+<div class="action-card ac-pause"><div class="action-tag">PAUSE</div><h4>Low-Volume Creatives (CPL > ₹250)</h4><p>"10 sec meds Video" (₹803/lead, 3 leads), "Carousel" (₹326, 5 leads), "Pillup makes simple" (₹391, 2 leads). Pause all three and save ₹4.8K.</p></div>`;
+
+// ===== MONTHLY PROGRESS TAB =====
+const daysElapsed=nFull;const daysInMonth=31;const daysPct=daysElapsed/daysInMonth;
+const fullDaySpend=fullDays.reduce((s,d)=>s+d.ts,0);const fullDayLpSpend=fullDays.reduce((s,d)=>s+d.lp,0);
+const fullDayLeads=fullDays.reduce((s,d)=>s+d.ll,0);
+const projSpend=Math.round(fullDaySpend/daysElapsed*daysInMonth);
+const projLpSpend=Math.round(fullDayLpSpend/daysElapsed*daysInMonth);
+const projLeads=Math.round(fullDayLeads/daysElapsed*daysInMonth);
+const projPrx=Math.round(ACT.prx/daysElapsed*daysInMonth);
+const projOrders=Math.round(ACT.orders/daysElapsed*daysInMonth);
+const projRev=Math.round(ACT.revenue/daysElapsed*daysInMonth);
+
+document.getElementById('prKpis').innerHTML=`
+<div class="kpi-card hl"><div class="kpi-label">Days Elapsed</div><div class="kpi-value">${daysElapsed} / 31</div><div class="kpi-sub">${(daysPct*100).toFixed(0)}% of month</div></div>
+<div class="kpi-card"><div class="kpi-label">Projected Spend</div><div class="kpi-value">${fmt(projSpend)}</div><div class="kpi-sub">Target: ${fmt(TGT.budget)}</div></div>
+<div class="kpi-card"><div class="kpi-label">Projected Leads</div><div class="kpi-value">${fmtN(projLeads)}</div><div class="kpi-sub">Target: ${fmtN(TGT.leads)}</div></div>
+<div class="kpi-card"><div class="kpi-label">Projected Revenue</div><div class="kpi-value">${fmt(projRev)}</div><div class="kpi-sub">Target: ${fmt(TGT.revenue)}</div></div>
+<div class="kpi-card"><div class="kpi-label">Projected ROAS</div><div class="kpi-value" style="color:${projRev/projSpend>=TGT.roas?'#22c55e':'#ef4444'}">${(projRev/projSpend).toFixed(2)}</div><div class="kpi-sub">Target: ${TGT.roas}</div></div>`;
+
+function pBar(label,actual,target,projected){
+const pctA=(actual/target*100);const pctP=(projected/target*100);
+const expected=daysPct*100;
+let cls=pctA>=expected?'ahead':pctA>=expected*.85?'on-track':pctA>=expected*.7?'behind':'critical';
+const statusTxt=pctA>=expected?'On Track':pctA>=expected*.85?'Slightly Behind':'Behind';
+return`<div class="progress-card"><h4>${label}</h4><div class="progress-bar-wrap"><div class="progress-bar-fill ${cls}" style="width:${Math.min(pctA,100)}%">${pctA.toFixed(0)}%</div></div><div class="progress-detail"><span>Achieved: ${typeof actual==='number'&&actual>1000?fmt(actual):fmtN(actual)}</span><span>Target: ${typeof target==='number'&&target>1000?fmt(target):fmtN(target)}</span><span>Projected: ${typeof projected==='number'&&projected>1000?fmt(projected):fmtN(projected)}</span></div></div>`}
+
+document.getElementById('progressBars').innerHTML=
+pBar('Total Spend',fullDaySpend,TGT.budget,projSpend)+
+pBar('LP Spend',fullDayLpSpend,TGT.perfBudget,projLpSpend)+
+pBar('Leads',fullDayLeads,TGT.leads,projLeads)+
+pBar('PRX Received',ACT.prx,TGT.prx,projPrx)+
+pBar('Orders',ACT.orders,TGT.orders,projOrders)+
+pBar('Revenue',ACT.revenue,TGT.revenue,projRev);
+
+// Cumulative charts
+const cumLeads=[],cumSpend=[],tgtLeadPace=[],tgtSpendPace=[];
+let cl=0,cs=0;
+fd.forEach((d,i)=>{cl+=d.ll;cs+=d.ts;cumLeads.push(cl);cumSpend.push(cs);tgtLeadPace.push(TGT.leads/31*(i+1));tgtSpendPace.push(TGT.budget/31*(i+1))});
+
+dc('chPrLeads');CI['chPrLeads']=new Chart(document.getElementById('chPrLeads'),{type:'line',data:{labels:lb,datasets:[{label:'Actual Leads',data:cumLeads,borderColor:'#1a8a6e',backgroundColor:'rgba(26,138,110,.1)',fill:true,tension:.2,pointRadius:3},{label:'Target Pace',data:tgtLeadPace,borderColor:'#94a3b8',borderDash:[5,3],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false}},y:{beginAtZero:true}}}});
+
+dc('chPrSpend');CI['chPrSpend']=new Chart(document.getElementById('chPrSpend'),{type:'line',data:{labels:lb,datasets:[{label:'Actual Spend',data:cumSpend,borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.08)',fill:true,tension:.2,pointRadius:3},{label:'Budget Pace',data:tgtSpendPace,borderColor:'#94a3b8',borderDash:[5,3],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>'₹'+Math.round(v/1000)+'K'}}}}});
+
+// Projections table
+const metrics=[
+{m:'Total Budget',tgt:TGT.budget,act:fullDaySpend,proj:projSpend},
+{m:'Perf (LP) Spend',tgt:TGT.perfBudget,act:fullDayLpSpend,proj:projLpSpend},
+{m:'Awareness Spend',tgt:TGT.awBudget,act:fullDays.reduce((s,d)=>s+d.aw+d.en+d.tr,0),proj:Math.round(fullDays.reduce((s,d)=>s+d.aw+d.en+d.tr,0)/daysElapsed*31)},
+{m:'Leads',tgt:TGT.leads,act:fullDayLeads,proj:projLeads},
+{m:'CPL',tgt:TGT.cpl,act:Math.round(fullDayLpSpend/fullDayLeads),proj:Math.round(projLpSpend/projLeads)},
+{m:'PRX Received',tgt:TGT.prx,act:ACT.prx,proj:projPrx},
+{m:'PRX Rate',tgt:TGT.prxRate*100,act:+(ACT.prx/fullDayLeads*100).toFixed(1),proj:+(ACT.prx/fullDayLeads*100).toFixed(1)},
+{m:'Orders',tgt:TGT.orders,act:ACT.orders,proj:projOrders},
+{m:'Conv Rate',tgt:TGT.convRate*100,act:+(ACT.convRate*100).toFixed(1),proj:+(ACT.convRate*100).toFixed(1)},
+{m:'Revenue',tgt:TGT.revenue,act:ACT.revenue,proj:projRev},
+{m:'ROAS',tgt:TGT.roas,act:+(ACT.revenue/fullDayLpSpend).toFixed(2),proj:+(projRev/projLpSpend).toFixed(2)},
+{m:'CPA',tgt:TGT.cpa,act:Math.round(fullDayLpSpend/ACT.orders),proj:Math.round(projLpSpend/projOrders)},
+{m:'AOV',tgt:TGT.aov,act:ACT.aov,proj:Math.round(projRev/projOrders)}
+];
+let prTb='';
+metrics.forEach(r=>{
+const isMoney=['Total Budget','Perf (LP) Spend','Awareness Spend','Revenue','CPA','AOV','CPL'].includes(r.m);
+const isPct=['PRX Rate','Conv Rate'].includes(r.m);
+const isRatio=r.m==='ROAS';
+const fv=v=>isMoney?fmt(v):isPct?v+'%':isRatio?v.toFixed(2):fmtN(v);
+const pctOfTgt=isRatio||isPct?(r.act/r.tgt*100):(r.act/r.tgt*100);
+const isGoodIfLow=['CPL','CPA'].includes(r.m);
+let status;
+if(isGoodIfLow){status=r.proj<=r.tgt*1.1?'<span class="badge badge-green">On Track</span>':r.proj<=r.tgt*1.3?'<span class="badge badge-yellow">Watch</span>':'<span class="badge badge-red">Behind</span>'}
+else{status=r.proj>=r.tgt*.9?'<span class="badge badge-green">On Track</span>':r.proj>=r.tgt*.75?'<span class="badge badge-yellow">Watch</span>':'<span class="badge badge-red">Behind</span>'}
+prTb+=`<tr><td><strong>${r.m}</strong></td><td class="num">${fv(r.tgt)}</td><td class="num">${fv(r.act)}</td><td class="num">${fv(r.proj)}</td><td class="num">${pctOfTgt.toFixed(0)}%</td><td>${status}</td></tr>`});
+document.querySelector('#tblProjections tbody').innerHTML=prTb;
+
+// ===== AWARENESS TAB =====
+document.getElementById('awKpis').innerHTML=`
+<div class="kpi-card" style="border-left:4px solid #3b82f6"><div class="kpi-label">Awareness Spend</div><div class="kpi-value">${fmt(aws)}</div></div>
+<div class="kpi-card" style="border-left:4px solid #8b5cf6"><div class="kpi-label">Engagement Spend</div><div class="kpi-value">${fmt(ens)}</div></div>
+<div class="kpi-card" style="border-left:4px solid #fb923c"><div class="kpi-label">Traffic Spend</div><div class="kpi-value">${fmt(trs)}</div></div>
+<div class="kpi-card"><div class="kpi-label">Total ToF</div><div class="kpi-value">${fmt(tof)}</div><div class="kpi-sub">${(tof/ts*100).toFixed(1)}% of budget</div></div>
+<div class="kpi-card"><div class="kpi-label">Est. Impressions</div><div class="kpi-value">${((aws/1.78*1000+trs/15.78*1000+ens/42.78*1000)/1000000).toFixed(1)}M</div></div>`;
+
+dc('chAwSpend');CI['chAwSpend']=new Chart(document.getElementById('chAwSpend'),{type:'bar',data:{labels:lb,datasets:[{label:'Awareness',data:fd.map(d=>d.aw),backgroundColor:'rgba(59,130,246,.7)',borderRadius:3},{label:'Engagement',data:fd.map(d=>d.en),backgroundColor:'rgba(168,85,247,.7)',borderRadius:3},{label:'Traffic',data:fd.map(d=>d.tr),backgroundColor:'rgba(251,146,60,.7)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,ticks:{callback:v=>'₹'+Math.round(v/1000)+'K'}}}}});
+
+dc('chAwImpr');CI['chAwImpr']=new Chart(document.getElementById('chAwImpr'),{type:'line',data:{labels:lb,datasets:[{label:'Awareness',data:fd.map(d=>Math.round(d.aw/1.78*1000)),borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.1)',fill:true,tension:.3,pointRadius:2},{label:'Traffic',data:fd.map(d=>Math.round(d.tr/15.78*1000)),borderColor:'#fb923c',backgroundColor:'rgba(251,146,60,.1)',fill:true,tension:.3,pointRadius:2},{label:'Engagement',data:fd.map(d=>Math.round(d.en/42.78*1000)),borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,.1)',fill:true,tension:.3,pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>(v/1000000).toFixed(1)+'M'}}}}});
+
+const awCamps=[{n:'Awareness Campaign',t:'Awareness',sp:aws,ctr:.13,cpc:3.07,cpm:1.78},{n:'Engagement Campaign',t:'Engagement',sp:ens,ctr:1.32,cpc:3.86,cpm:42.78},{n:'Traffic Campaign',t:'Traffic',sp:trs,ctr:3.99,cpc:.51,cpm:15.78}];
+let awTb='';awCamps.forEach(c=>{awTb+=`<tr><td>${c.n}</td><td><span class="badge badge-blue">${c.t}</span></td><td class="num">${fmt(c.sp)}</td><td class="num">${pct(c.ctr)}</td><td class="num">${fmt(c.cpc)}</td><td class="num">${fmt(c.cpm)}</td><td class="num">${(c.sp/c.cpm*1000/1000000).toFixed(2)}M</td></tr>`});
+document.querySelector('#tblAw tbody').innerHTML=awTb;
+}
+
+renderAll();
+</script>
+</body>
+</html>
